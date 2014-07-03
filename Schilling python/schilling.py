@@ -7,17 +7,18 @@ class DeltaVtot:
 	M = 5.97219e24
 	rj = 6371000
 
-	def __init__(self, Tmix, alt = 200000, lat = 28):
+	def __init__(self, Tmix, alt = 200000, lat = 28, incl = 28):
 		self.alt = alt
 		self.lat = lat
 		self.Tmix = Tmix
-		
+		self.incl = incl
+
 	def Vcirc(self):
 		return Vcirc(self.alt)
 
 	def Vrot(self):
 		omega = 2*math.pi/(24*60*60)
-		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)
+		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos(self.incl*math.pi/180) #cos*cos?
 		return Vrot
 
 	def Vpen(self):
@@ -31,35 +32,44 @@ class DeltaVtot:
 		return self.Vcirc() + self.Vpen() - self.Vrot() 
 	
 def Vcirc(alt):
-	Vcirc = math.sqrt(DeltaVtot.M*DeltaVtot.G/(alt+DeltaVtot.rj))
+	Vcirc = math.sqrt(DeltaVtot.M*DeltaVtot.G/(alt+DeltaVtot.rj)) 
 	return Vcirc
 
 
 #rocket data
-Isp1SL = 282
-Isp1V = 345
-m1wet = 402000
-m1dry = 16000
-m1res = 30568
-T1 = 5886e3 
+Isp1SL = 321
+Isp1V = 363
+m1wet = 2449399
+m1dry = 85729
+m1res = 153638
+T1 = 40061537 
 m1b = m1wet - m1dry - m1res
 
-Isp2V = 345
-m2wet = 90720
-m2dry = 3200
-m2res = 182
-T2 = 8e5
+
+Isp2V = 377
+m2wet = 816466
+m2dry = 53070
+m2res = 1527
+T2 = 10430178
 m2b = m2wet - m2dry - m2res
 
-A0 = T1/(m1wet + m2wet) # + payload!!!!
+mp = 128367
+
+A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
+print A0
 
 #launch data
 alt = 200000
-lat = 28
-Tmix = ascTime.Tmix(m1b, Isp1SL, T1, m2b, Isp2V, T2, Vcirc(alt), Isp1V, A0) # antar haer att deltaVp i schilling = Vcirc
+lat = 26
+incl = 26
+ssT = 0 						# stage separation time. antar ingen thrust under denna tid
+Tmix = ascTime.Tmix(m1b, Isp1SL, T1, m2b, Isp2V, T2, Vcirc(alt), Isp1V, A0, ssT) # antar haer att deltaVp i schilling = Vcirc
 
 
-deltaV = DeltaVtot(Tmix, alt, lat)
+deltaV = DeltaVtot(Tmix, alt, lat, incl)
+print ""
+print "data:"
+print ""
 print "Vcirc: %f" % deltaV.Vcirc()
 print "Vrot: %f" % deltaV.Vrot()
 print "Tmix: %f" % Tmix
