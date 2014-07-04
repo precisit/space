@@ -42,7 +42,7 @@ Isp1V = 363
 m1wet = 2449399
 m1dry = 85729
 m1res = 153638
-T1 = 40061537 
+T1 = 40061537.0
 m1b = m1wet - m1dry - m1res
 
 
@@ -56,7 +56,7 @@ m2b = m2wet - m2dry - m2res
 mp = 128367
 
 A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
-print A0
+print "A0", A0
 
 #launch data
 alt = 200000
