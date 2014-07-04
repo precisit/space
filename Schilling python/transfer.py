@@ -5,7 +5,6 @@ M = 5.97219e24
 rj = 6371000
 my = G*M
 
-@stat
 class hohmann:
 	def circToEll(alt1, alt2):
 		r1 = alt1 + rj
