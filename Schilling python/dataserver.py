@@ -3,6 +3,7 @@ import tornado.web
 import tornado.escape
 import json
 import urllib
+import mainschilling
 
 """
 Ett enkelt program dar man kan skriva in data i tva textboxar.
@@ -23,12 +24,13 @@ class DataHandler(tornado.web.RequestHandler):
     def post(self):
         self.render('calc.html')    # Renderar en testsida 
         params = self.request.arguments # Parametrarna fran formularet
-        print params
+        res = mainschilling.deltaV(params)
+        print res
         
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/calc", DataHandler),
 ])
 
-application.listen(8010)
+application.listen(8020)
 tornado.ioloop.IOLoop.instance().start()

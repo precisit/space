@@ -36,44 +36,45 @@ def Vcirc(alt):
 	return Vcirc
 
 
-#rocket data
-Isp1SL = 321
-Isp1V = 363
-m1wet = 2449399
-m1dry = 85729
-m1res = 153638
-T1 = 40061537.0
-m1b = m1wet - m1dry - m1res
+if __name__ == "__main__":
+	#rocket data
+	Isp1SL = 321
+	Isp1V = 363
+	m1wet = 2449399
+	m1dry = 85729
+	m1res = 153638
+	T1 = 40061537.0
+	m1b = m1wet - m1dry - m1res
 
-# 
-Isp2V = 377
-m2wet = 816466
-m2dry = 53070
-m2res = 1527
-T2 = 10430178
-m2b = m2wet - m2dry - m2res
+	# 
+	Isp2V = 377
+	m2wet = 816466
+	m2dry = 53070
+	m2res = 1527
+	T2 = 10430178
+	m2b = m2wet - m2dry - m2res
 
-mp = 128367
+	mp = 128367
 
-A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
-print "A0", A0
+	A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
+	print "A0", A0
 
-#launch data
-alt = 200000
-lat = 26
-incl = 26
-ssT = 0 						# stage separation time. antar ingen thrust under denna tid
-Tmix = ascTime.Tmix(m1b, Isp1SL, T1, m2b, Isp2V, T2, Vcirc(alt), Isp1V, A0, ssT) # antar haer att deltaVp i schilling = Vcirc
+	#launch data
+	alt = 200000
+	lat = 26
+	incl = 26
+	ssT = 0 						# stage separation time. antar ingen thrust under denna tid
+	Tmix = ascTime.Tmix(m1b, Isp1SL, T1, m2b, Isp2V, T2, Vcirc(alt), Isp1V, A0, ssT) # antar haer att deltaVp i schilling = Vcirc
 
 
-deltaV = DeltaVtot(Tmix, alt, lat, incl)
-print ""
-print "data:"
-print ""
-print "Vcirc: %f" % deltaV.Vcirc()
-print "Vrot: %f" % deltaV.Vrot()
-print "Tmix: %f" % Tmix
-print "Vpen: %f" % deltaV.Vpen()
-print "deltaVtot: %f" % deltaV.deltaVtot()
-#mp = brentq(deltaV.f, 10000,20000)
-#print "mp: %f" % mp
+	deltaV = DeltaVtot(Tmix, alt, lat, incl)
+	print ""
+	print "data:"
+	print ""
+	print "Vcirc: %f" % deltaV.Vcirc()
+	print "Vrot: %f" % deltaV.Vrot()
+	print "Tmix: %f" % Tmix
+	print "Vpen: %f" % deltaV.Vpen()
+	print "deltaVtot: %f" % deltaV.deltaVtot()
+	#mp = brentq(deltaV.f, 10000,20000)
+	#print "mp: %f" % mp
