@@ -28,26 +28,27 @@ def Tmix(rocketdata):
 	return Tjson
 
 #rocket data
-Isp1SL = 321
-Isp1V = 363
-m1wet = 2449399
-m1dry = 85729
-m1res = 153638
-T1 = 40061537.0
-m1b = m1wet - m1dry - m1res
-	# 
-Isp2V = 377
-m2wet = 816466
-m2dry = 53070
-m2res = 1527
-T2 = 10430178
-m2b = m2wet - m2dry - m2res
-mp = 128367
-ssT = 0
-A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
-print "A0", A0
+if __name__ == '__main__':
+	Isp1SL = 321
+	Isp1V = 363
+	m1wet = 2449399
+	m1dry = 85729
+	m1res = 153638
+	T1 = 40061537.0
+	m1b = m1wet - m1dry - m1res
+		# 
+	Isp2V = 377
+	m2wet = 816466
+	m2dry = 53070
+	m2res = 1527
+	T2 = 10430178
+	m2b = m2wet - m2dry - m2res
+	mp = 128367
+	ssT = 0
+	A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
+	print "A0", A0
 
-data = {"Isp1SL":Isp1SL, "Isp" : Isp1V, "m1b" : m1b, "T1" : T1, "Isp1V" : Isp1V,
-		"m2b" : m2b, "Isp2V" : Isp2V, "T2" : T2, "deltaVp" : 7788, "A0" : A0, "ssT" : ssT}
-rocketdata = json.dumps(data)
-print Tmix(rocketdata)
+	data = {"Isp1SL":Isp1SL, "Isp" : Isp1V, "m1b" : m1b, "T1" : T1, "Isp1V" : Isp1V,
+			"m2b" : m2b, "Isp2V" : Isp2V, "T2" : T2, "deltaVp" : 7788, "A0" : A0, "ssT" : ssT}
+	rocketdata = json.dumps(data)
+	print Tmix(rocketdata)
