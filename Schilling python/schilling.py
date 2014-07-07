@@ -1,27 +1,31 @@
 import math
 import ascTime
 import mainschilling
+
 class DeltaVtot:
 	
-	G = 6.6743e-11
-	g = 9.81
-	M = 5.97219e24
-	rj = 6371000
+	G = 6.6743e-11		# Universal gravitational constant
+	g = 9.816466 		# Gravity at sea level
+	M = 5.97219e24		# Mass of the Eart [kg]
+	rj = 6371000		# Radius of the Earth [m]
 
 	def __init__(self, Tmix, alt = 200000, lat = 28, incl = 28):
-		self.alt = alt
-		self.lat = lat
-		self.Tmix = Tmix
-		self.incl = incl
+		self.alt = alt 		# Altitude for the parking orbit
+		self.lat = lat		# Latitude for the launch site
+		self.Tmix = Tmix	# Weighted ascent time according to eq.6 in Schilling
+		self.incl = incl	# Inclination fot he parking orbit
 
+	# Tangential velocity in the parking orbit
 	def Vcirc(self):
 		return Vcirc(self.alt)
 
+	# Velocity contribution due to earth rotation
 	def Vrot(self):
 		omega = 2*math.pi/(24*60*60)
-		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos(self.incl*math.pi/180) #cos*cos?
+		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos(self.incl*math.pi/180) #cos*cos? # Cos of angle diff.?
 		return Vrot
 
+	# Velocity penalty according to eq.2 in Schilling
 	def Vpen(self):
 		Hp = self.alt/1000
 		K3 = 429.9 + 1.602*Hp + 1.2243e-3*Hp**2
@@ -29,9 +33,11 @@ class DeltaVtot:
 		Vpen = K3 + K4*self.Tmix
 		return Vpen
 
+	# Total delta-v required
 	def deltaVtot(self):
 		return self.Vcirc() + self.Vpen() - self.Vrot() 
 	
+#Tangential velocity at altitude alt
 def Vcirc(alt):
 	Vcirc = math.sqrt(DeltaVtot.M*DeltaVtot.G/(alt+DeltaVtot.rj)) 
 	return Vcirc

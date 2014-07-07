@@ -1,4 +1,3 @@
-<html><body>
 <script>
 var myNumbers = {
 	"tal1": 10,
@@ -13,5 +12,4 @@ $.post( "http://hampus.simulations.io/add", jsonObj, function( result ) {
 	console.log(result.summa); //Skriv ut summan
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
-</body></script>
-</html>
+</script>

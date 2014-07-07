@@ -1,0 +1,23 @@
+<html><body>
+<?php header("Access-Control-Allow-Headers: x-requested-with"); ?>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+
+var myNumbers = {
+	"tal1": 10,
+	"tal2": 15
+}
+
+document.write("HAMPUS");
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("http://hampus.simulations.io/add", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log(result.response); //Skriv ut summan
+
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+</script>
+</body>
+</html> 
