@@ -2,32 +2,38 @@ import math
 import schilling
 import ascTime
 import json
-# Script that converts JSON objects to parameters, and inputs them in functions. returns JSON objects
-# containing results
+# Script that converts JSON objects to parameters, and inputs them in their designated
+# functions. Returns JSON objects containing results
 
 
 
 # requires a time for ascention ("Tmix"), an altitude("alt"), 
 # a latitude for launch ("lat"), and an inclination ("incl")
 def deltaV(params):
-	orbPar = json.loads(params)
+	
+	
 	dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
 	dVtot = dVobj.deltaVtot()
 	dVtotJson = json.dumps({"dVtot":dVtot})
 	return dVtotJson
 
+# Requires lots of parameters of the rocket. 
 def Tmix(params):
 	rockPar = json.loads(params) 
-	Tmix = ascTime.Tmix(rockPar["m1b"], rockPar["Isp1SL"], ["T1"], rockPar["m2b"], rockPar["Isp2V"], rockPar["T2"], 
-						rockPar["deltaVp"], rockPar["Isp1V"], rockPar["A0"], rockPar["ssT"])
+	Tmix = ascTime.Tmix(rockPar["m1b"], rockPar["Isp1SL"], rockPar["T1"], rockPar["m2b"], rockPar["Isp2V"], 
+						rockPar["T2"], rockPar["deltaVp"], rockPar["Isp1V"], rockPar["A0"], rockPar["ssT"])
 	TmixJson = json.dumps({"Tmix":Tmix})
 	return TmixJson
 
 
 if __name__ == "__main__":
 	orbPar = {"Tmix":500,"alt":200000,"lat":28,"incl":28}
+	rockPar = {"m1b":40000, "Isp1SL":300, "T1": 70000, "m2b":40000, "Isp2V": 350, "T2":30000, "deltaVp":7788, "Isp1V":290, "A0":13, "ssT": 0}
 	params = json.dumps(orbPar)
+	paramRock = json.dumps(rockPar)
 	print deltaV(params)
+	print Tmix(paramRock)
+
 """
 	alt = float(params["alt"][0])
 	lat = float(params["lat"][0])
