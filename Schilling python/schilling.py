@@ -1,6 +1,6 @@
 import math
 import ascTime
-import mainschilling
+#import mainschilling
 
 class DeltaVtot:
 	
@@ -42,7 +42,7 @@ def Vcirc(alt):
 	Vcirc = math.sqrt(DeltaVtot.M*DeltaVtot.G/(alt+DeltaVtot.rj)) 
 	return Vcirc
 
-
+	#test
 if __name__ == "__main__":
 	#rocket data
 	Isp1SL = 321
