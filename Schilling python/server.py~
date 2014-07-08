@@ -29,7 +29,7 @@ class SubtractHandler(tornado.web.RequestHandler):
 #For testing of delta-V calculations
 class TestHandler(tornado.web.RequestHandler):
     def post(self):
-        indata = self.request.body
+        indata = json.loads(self.request.body)
         response = {}
         response["Tmix"] = mainschilling.Tmix(indata)
         print(response)

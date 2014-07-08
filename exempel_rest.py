@@ -32,5 +32,5 @@ application = tornado.web.Application([
 ], autoreload=True)
 
 #TODO: https on prod
-application.listen(8040)
+application.listen(8020)
 tornado.ioloop.IOLoop.instance().start()
