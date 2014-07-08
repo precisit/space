@@ -29,27 +29,19 @@ class SubtractHandler(tornado.web.RequestHandler):
 #For testing of delta-V calculations
 class TestHandler(tornado.web.RequestHandler):
     def post(self):
-        indata = self.request.body
-<<<<<<< HEAD
-        response = mainschilling.deltaV(indata)
-=======
+        indata = json.loads(self.request.body)
         response = {}
         response["Tmix"] = mainschilling.Tmix(indata)
->>>>>>> 2e2d24ccea6204ff81b255474e6ba87d5461414e
         print(response)
         self.write(json.dumps(response))
 
 application = tornado.web.Application([
-    (r"/ping", PingHandler),
+    (r"/Ping", PingHandler),
     (r"/add", AddHandler),
     (r"/subtract", SubtractHandler),
     (r"/test", TestHandler)
 ], autoreload=True)
 
 #TODO: https on prod
-<<<<<<< HEAD
-application.listen(8010)
-=======
 application.listen(8020)
->>>>>>> 2e2d24ccea6204ff81b255474e6ba87d5461414e
 tornado.ioloop.IOLoop.instance().start()
