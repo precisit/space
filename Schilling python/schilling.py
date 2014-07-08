@@ -22,7 +22,7 @@ class DeltaVtot:
 	# Velocity contribution due to earth rotation
 	def Vrot(self):
 		omega = 2*math.pi/(24*60*60)
-		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos(self.incl*math.pi/180) #cos*cos? # Cos of angle diff.?
+		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos((self.incl-self.lat)*math.pi/180) #cos*cos? # Cos of angle diff.?
 		return Vrot
 
 	# Velocity penalty according to eq.2 in Schilling

@@ -3,8 +3,14 @@ import schilling
 import ascTime
 from scipy import optimize
 
+"""
+Scrip that is used for solving Schillings method combined with the rocket equation
+for payload mass.
+"""
 class mpClass:
 
+	# Constructor that sets the "constant" values for the launch, such as the rockets different masses, thrust,
+	# the inclination, latitude and altitude of the orbit.
 	def __init__(self, mw1, md1, mr1, Isp1SL, Isp1V, T1, 
 				mw2, md2, mr2, Isp2V, T2, alt, lat, incl, ssT = 0):
 		self.mw1 = mw1
@@ -28,6 +34,9 @@ class mpClass:
 		self.mb1 = mw1-md1-mr1
 		self.mb2 = mw2-md2-mr2
 	
+	# a function of payload mass that is calculated by the difference between the schilling method delta-v, and the 
+	# delta-v of the rocket. Since Schillings method requires a deltav to parking orbit, this is approximated using 
+	# Townsends method.
 	def mpFunc(self, mp):
 		A0 = self.T1/(self.mw1 + self.mw2 + mp)
 		Ta = ascTime.Ta(self.mb1, self.Isp1SL, self.T1, self.mb2, self.Isp2V, self.T2, self.ssT)
@@ -40,6 +49,9 @@ class mpClass:
 					self.Isp2V*9.81*math.log((self.mw2 + mp)/(self.md2 + self.mr2 + mp))
 		return dVSch - dVRockeq
 
+# The solving function which takes the orbit- and rocket parameters and returns the maximum payload. This is solved 
+# by using the brentq-method from the scipy-library. The solution for maximum payload mass is assumed to be in the 
+# interval [0, mwtot], where mwtot is the totala wet mass of the stage-1 and stage-2 rockets
 def mpSolve(mw1, md1, mr1, Isp1SL, Isp1V, T1, 
 			mw2, md2, mr2, Isp2V, T2, alt, lat, incl, ssT):
 	mpObj = mpClass(mw1, md1, mr1, Isp1SL, Isp1V, T1, 
