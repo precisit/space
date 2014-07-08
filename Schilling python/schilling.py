@@ -1,11 +1,10 @@
 import math
 import ascTime
 import mainschilling
+from scipy import constants as consts
 
 class DeltaVtot:
 	
-	G = 6.6743e-11		# Universal gravitational constant
-	g = 9.816466 		# Gravity at sea level
 	M = 5.97219e24		# Mass of the Eart [kg]
 	rj = 6371000		# Radius of the Earth [m]
 
@@ -39,7 +38,7 @@ class DeltaVtot:
 	
 #Tangential velocity at altitude alt
 def Vcirc(alt):
-	Vcirc = math.sqrt(DeltaVtot.M*DeltaVtot.G/(alt+DeltaVtot.rj)) 
+	Vcirc = math.sqrt(DeltaVtot.M*consts.G/(alt+DeltaVtot.rj)) 
 	return Vcirc
 
 
