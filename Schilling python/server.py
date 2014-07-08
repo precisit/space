@@ -34,16 +34,26 @@ class TestHandler(tornado.web.RequestHandler):
         response = mainschilling.deltaV(indata)
 =======
         response = {}
+<<<<<<< HEAD
         response["Tmix"] = mainschilling.Tmix(indata)
 >>>>>>> 2e2d24ccea6204ff81b255474e6ba87d5461414e
+=======
+        response["mp"] = mainschilling.mpSolver(indata)
+>>>>>>> d8e3535713403719fef855539e50c015988ca6a8
         print(response)
         self.write(json.dumps(response))
+
+# for further testing of the REST-APIs
+class TestjsHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('test.html')
 
 application = tornado.web.Application([
     (r"/ping", PingHandler),
     (r"/add", AddHandler),
     (r"/subtract", SubtractHandler),
-    (r"/test", TestHandler)
+    (r"/test", TestHandler),
+    (r"/testjs",TestjsHandler)
 ], autoreload=True)
 
 #TODO: https on prod

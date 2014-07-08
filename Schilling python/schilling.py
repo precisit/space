@@ -1,7 +1,11 @@
 import math
 import ascTime
+<<<<<<< HEAD
 import mainschilling
 from scipy import constants as consts
+=======
+#import mainschilling
+>>>>>>> d8e3535713403719fef855539e50c015988ca6a8
 
 class DeltaVtot:
 	
@@ -21,7 +25,7 @@ class DeltaVtot:
 	# Velocity contribution due to earth rotation
 	def Vrot(self):
 		omega = 2*math.pi/(24*60*60)
-		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos(self.incl*math.pi/180) #cos*cos? # Cos of angle diff.?
+		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos((self.incl-self.lat)*math.pi/180) #cos*cos? # Cos of angle diff.?
 		return Vrot
 
 	# Velocity penalty according to eq.2 in Schilling
@@ -41,7 +45,7 @@ def Vcirc(alt):
 	Vcirc = math.sqrt(DeltaVtot.M*consts.G/(alt+DeltaVtot.rj)) 
 	return Vcirc
 
-
+	#test
 if __name__ == "__main__":
 	#rocket data
 	Isp1SL = 321
