@@ -11,10 +11,10 @@ def gravForce(m,r):
 	return F
 
 
-r = 200000*np.array([1.,1,0])
+r = (6371e3 + 200000)*np.array([1.,0,0])
 m = 9000
-steps = 10
-ttot = 10000
+steps = 100.
+ttot = 5000.
 t = 0
 dt = ttot/steps
 i = 0
@@ -23,11 +23,15 @@ rsave = np.empty([steps,3])
 vsave = np.empty([steps,3])
 
 while (i < steps) :
-	a = gravForce(m,r)/m
+	if (i>0.7*steps):										#initiate burn at 70% of elapsed test time
+		a = gravForce(m,r)/m +2*v/(math.sqrt(np.dot(v,v)))
+	else:
+		a = gravForce(m,r)/m
+	
 	print a
-	v = v + a*t
+	v = v + a*dt
 	print v
-	r = r + v*t
+	r = r + v*dt
 	print r
 	print ""
 	rsave[i,:] = r 
