@@ -28,12 +28,16 @@ class SubtractHandler(tornado.web.RequestHandler):
 
 #For testing of delta-V calculations
 class TestHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
     def post(self):
-        indata = self.request.body
-        response = mainschilling.deltaV(indata)
-        response["Tmix"] = mainschilling.Tmix(indata)
-        response["mp"] = mainschilling.mpSolver(indata)
-        print(response)
+        indata = json.loads(self.request.body)
+        #response["Tmix"] = mainschilling.Tmix(indata)
+        #response["mp"] = mainschilling.mpSolver(indata)
+        #print(response)
+        response = {}
+        response['dVtot'] = mainschilling.deltaV(indata)
         self.write(json.dumps(response))
 
 # for further testing of the REST-APIs

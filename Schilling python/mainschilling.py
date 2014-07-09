@@ -12,12 +12,12 @@ import mpsolver
 
 	# requires a time for ascent ("Tmix"), an altitude("alt"), 
 	# a latitude for launch ("lat"), and an inclination ("incl")
-def deltaV(params):
-	orbPar = json.loads(params)	
+def deltaV(orbPar):
+	#orbPar = json.loads(params) #JSON moved out of schilling and into server, good to do JSON conversion first thing and last thing
 	dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
 	dVtot = dVobj.deltaVtot()
-	dVtotJson = json.dumps({"dVtot":dVtot})
-	return dVtotJson
+	#dVtotJson = json.dumps({"dVtot":dVtot})
+	return dVtot
 
 	# Requires lots of parameters for the rocket. Also does the calculations for the mass of the fuel and approximates
 	# a value for deltaVp, if not given. Returns an ascent time "Tmix"
