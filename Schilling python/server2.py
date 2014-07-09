@@ -93,7 +93,7 @@ application = tornado.web.Application([
     (r"/testjs",TestjsHandler),
     (r"/deltaV",DeltaVHandler),
     (r"/Tmix",TmixHandler),
-    (r"/rocketCapability",RocketCapabilityHandler)
+    (r"/rocketCapability",RocketCapabilityHandler),
     (r"/deltaVwoTmix",deltaVwoTmixHandler)
 
 ], autoreload=True)
