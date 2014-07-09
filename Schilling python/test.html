@@ -108,6 +108,25 @@ $.post("http://hans-erik.simulations.io/rocketCapability", jsonObj, function( re
 //	Isp2V: 345, T2:800e3, alt:200000, lat: 28, incl:28, ssT: 0
 
 
+var myNumbers = {
+	mw1:402000,md1:16000, mr1:3900, Isp1SL:282, Isp1V:320, T1: 5885e3, mw2:90720, md2:3200,mr2:182, m2res:182, 
+	Isp2V: 345, T2:800e3, alt:200000, lat: 28, incl:28, ssT: 0, mp:17698
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
+$.post("http://hans-erik.simulations.io/deltaVwoTmix", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log(result.deltaVwoTmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+//mw1:402000,md1:16000, mr1:3900, Isp1SL:282, Isp1V:320, T1: 5885e3, mw2:90720, md2:3200,mr2:182, m2res:182, 
+//	Isp2V: 345, T2:800e3, alt:200000, lat: 28, incl:28, ssT: 0
+
 </script>
 </body>
 </html> 

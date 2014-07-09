@@ -75,6 +75,16 @@ class RocketCapabilityHandler(tornado.web.RequestHandler):
         response["mp"] = mainschilling.mpSolver(indata)
         self.write(json.dumps(response))
 
+class deltaVwoTmixHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        response["deltaVwoTmix"] = mainschilling.deltaVwoTmix(indata)
+        self.write(json.dumps(response))
+
 application = tornado.web.Application([
     (r"/ping", PingHandler),
     (r"/add", AddHandler),
@@ -84,6 +94,8 @@ application = tornado.web.Application([
     (r"/deltaV",DeltaVHandler),
     (r"/Tmix",TmixHandler),
     (r"/rocketCapability",RocketCapabilityHandler)
+    (r"/deltaVwoTmix",deltaVwoTmixHandler)
+
 ], autoreload=True)
 
 #TODO: https on prod

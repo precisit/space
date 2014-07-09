@@ -4,8 +4,8 @@ import ascTime
 import json
 import mpsolver
 """
- Script that converts JSON objects to parameters, and inputs them in their designated
- functions. Returns JSON objects containing results
+ Script that holds the main functions, takes parameters, and inputs them in their underlying
+ functions. returns dictionaries containing results
 
 """
 
@@ -37,17 +37,36 @@ def mpSolver(mpsolvePar):
 		mpsolvePar["Isp2V"], mpsolvePar["T2"], mpsolvePar["alt"], mpsolvePar["lat"], mpsolvePar["incl"], mpsolvePar["ssT"])
 	return mp
 
+def deltaVwoTmix(param):
+	param["mb1"] = param["mw1"]-param["md1"]-param["mr1"]
+	param["mb2"] = param["mw2"]-param["md2"]-param["mr2"]
+	param["A0"] = param["T1"]/(param["mw1"] + param["mw2"] + param["mp"])
+	Ta = ascTime.Ta(param["mb1"], param["Isp1SL"], param["T1"], param["mb2"], param["Isp2V"], param["T2"], param["ssT"])
+	dVobjTa = schilling.DeltaVtot(Ta, param["alt"], param["lat"], param["incl"])
+	deltaVp = dVobjTa.deltaVtot()
+	Tmix = ascTime.Tmix(param["mb1"], param["Isp1SL"], param["T1"], param["mb2"], param["Isp2V"], 
+						param["T2"], deltaVp, param["Isp1V"], param["A0"], param["ssT"])
+	dVobjTmix = schilling.DeltaVtot(Tmix, param["alt"], param["lat"], param["incl"])
+	dVTmix = dVobjTmix.deltaVtot()
+	return dVTmix
 	#testprogram
+
 if __name__ == "__main__":
-	orbPar = {"Tmix":500,"alt":200000,"lat":28,"incl":28}
+
+	orbPar = {"Tmix":553.83,"alt":200000,"lat":28,"incl":28}
 	rockPar = {"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885e3, "mw2":90720, "md2":3200,"mr2":182, "m2res":182, 
-					"Isp2V": 345, "T2":800e3, "alt":200000, "lat": 28, "incl":28, "ssT": 0, "mp":17362}
+					"Isp2V": 345, "T2":800e3, "alt":200000, "lat": 28, "incl":28, "ssT": 0, "mp":17698}
 	mpsolvePar = {"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885e3, "mw2":90720, "md2":3200,"mr2":182, "m2res":182, 
 					"Isp2V": 345, "T2":800e3, "alt":200000, "lat": 28, "incl":28, "ssT": 0}
+	dVwoTmixpar = mpsolvePar
+	dVwoTmixpar["mp"] = 17698
 
 	mp = mpSolver(mpsolvePar)
 	deltaV = deltaV(orbPar)
 	Tmix = Tmix(rockPar)
+	deltaVwoTmix = deltaVwoTmix(dVwoTmixpar)
+
+	print "deltaVwoTmix", deltaVwoTmix
 	print "mp", mp
 	print "deltaV", deltaV
 	print "Tmix", Tmix
