@@ -30,16 +30,9 @@ class SubtractHandler(tornado.web.RequestHandler):
 class TestHandler(tornado.web.RequestHandler):
     def post(self):
         indata = self.request.body
-<<<<<<< HEAD
         response = mainschilling.deltaV(indata)
-=======
-        response = {}
-<<<<<<< HEAD
         response["Tmix"] = mainschilling.Tmix(indata)
->>>>>>> 2e2d24ccea6204ff81b255474e6ba87d5461414e
-=======
         response["mp"] = mainschilling.mpSolver(indata)
->>>>>>> d8e3535713403719fef855539e50c015988ca6a8
         print(response)
         self.write(json.dumps(response))
 
@@ -57,9 +50,5 @@ application = tornado.web.Application([
 ], autoreload=True)
 
 #TODO: https on prod
-<<<<<<< HEAD
 application.listen(8010)
-=======
-application.listen(8020)
->>>>>>> 2e2d24ccea6204ff81b255474e6ba87d5461414e
 tornado.ioloop.IOLoop.instance().start()

@@ -1,11 +1,7 @@
 import math
 import ascTime
-<<<<<<< HEAD
 import mainschilling
 from scipy import constants as consts
-=======
-#import mainschilling
->>>>>>> d8e3535713403719fef855539e50c015988ca6a8
 
 class DeltaVtot:
 	
