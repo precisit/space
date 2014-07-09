@@ -45,59 +45,14 @@ class TestjsHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('test.html')
 
-class DeltaVHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
-
-    def post(self):
-        indata = json.loads(self.request.body)
-        response = {}
-        response['dVtot'] = mainschilling.deltaV(indata)
-        self.write(json.dumps(response))
-
-class TmixHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
-
-    def post(self):
-        indata = json.loads(self.request.body)
-        response = {}
-        response["Tmix"] = mainschilling.Tmix(indata)
-        self.write(json.dumps(response))
-
-class RocketCapabilityHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
-
-    def post(self):
-        indata = json.loads(self.request.body)
-        response = {}
-        response["mp"] = mainschilling.mpSolver(indata)
-        self.write(json.dumps(response))
-
-class deltaVwoTmixHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
-
-    def post(self):
-        indata = json.loads(self.request.body)
-        response = {}
-        response["deltaVwoTmix"] = mainschilling.deltaVwoTmix(indata)
-        self.write(json.dumps(response))
-
 application = tornado.web.Application([
     (r"/ping", PingHandler),
     (r"/add", AddHandler),
     (r"/subtract", SubtractHandler),
     (r"/test", TestHandler),
-    (r"/testjs",TestjsHandler),
-    (r"/deltaV",DeltaVHandler),
-    (r"/Tmix",TmixHandler),
-    (r"/rocketCapability",RocketCapabilityHandler),
-    (r"/deltaVwoTmix",deltaVwoTmixHandler)
-
+    (r"/testjs",TestjsHandler)
 ], autoreload=True)
 
 #TODO: https on prod
-application.listen(8020)
+application.listen(8010)
 tornado.ioloop.IOLoop.instance().start()
