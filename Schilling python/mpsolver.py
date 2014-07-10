@@ -45,8 +45,12 @@ class mpClass:
 		Tmix = ascTime.Tmix(self.mb1, self.Isp1SL, self.T1, self.mb2, self.Isp2V, self.T2, deltaVp, self.Isp1V, A0, self.ssT)
 		dVobjTmix = schilling.DeltaVtot(Tmix, self.alt, self.lat, self.incl)
 		dVSch = dVobjTmix.deltaVtot()
-		dVRockeq = self.Isp1SL*9.81*math.log((self.mw1 + self.mw2 + mp)/(self.md1 + self.mr1 + self.mw2 + mp)) + \
-					self.Isp2V*9.81*math.log((self.mw2 + mp)/(self.md2 + self.mr2 + mp))
+		m01 = self.mw1 + self.mw2 + mp
+		m11 = self.md1 + self.mr1 + self.mw2 + mp
+		m02 = self.mw2 + mp
+		m12 = self.md2 + self.mr2 + mp
+		Isp1avg = (self.Isp1V + self.Isp1SL)/2 								#self.Isp1SL ger en mycket mindre mp
+		dVRockeq = ascTime.rockEq(m01, m11, m02, m12, Isp1avg, self.Isp2V)
 		return dVSch - dVRockeq
 
 # The solving function which takes the orbit- and rocket parameters and returns the maximum payload. This is solved 
