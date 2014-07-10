@@ -16,7 +16,9 @@ document.write("HI MOM!");
 */
 
 var myNumbers = {
-	Tmix: 570,
+	Tmix: 443, //optional
+	Ta: 500, //optional
+	Isp: 320, //optional
 	alt: 200000,
 	lat: 28,
 	incl: 28
@@ -85,8 +87,29 @@ $.post("/Tmix", jsonObj, function( result ) {
 
 
 
+/* from meeting
+var myNumbers = {
+	firstStage: {
+		wetMass: 123123,
+		dryMass: 123123,
+	},
+	secondStage: {
+		wetMass: 123123,
+		dryMass: 123123,
+	}
+}
 
+var rocketData: {
+	stages: [ {
+		wetMass: 123123,
+		dryMass: q23q3,
+		isp: 12312
+	}, {}, {}, {}, {}]
+}
 
+rocketData.stages[0].wetMass
+rocketData.stages[1].wetMass
+*/
 
 var myNumbers = {
 	mw1:402000,md1:16000, mr1:3900, Isp1SL:282, Isp1V:320, T1: 5885e3, mw2:90720, md2:3200,mr2:182, m2res:182, 
