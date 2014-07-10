@@ -13,8 +13,11 @@ import mpsolver
 	# requires a time for ascent ("Tmix"), an altitude("alt"), 
 	# a latitude for launch ("lat"), and an inclination ("incl")
 def deltaV(orbPar):
-	dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
-	dVtot = dVobj.deltaVtot()
+	if ("Tmix" in orbPar):
+		dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
+		dVtot = dVobj.deltaVtot()
+	else:
+		dVtot = deltaVwoTmix(orbPar)
 	return dVtot
 
 	# Requires lots of parameters for the rocket. Also does the calculations for the mass of the fuel and approximates
@@ -62,11 +65,13 @@ if __name__ == "__main__":
 	dVwoTmixpar["mp"] = 17698
 
 	mp = mpSolver(mpsolvePar)
-	deltaV = deltaV(orbPar)
+	deltaV1 = deltaV(orbPar)
+	deltaV2 = deltaV( dVwoTmixpar )
 	Tmix = Tmix(rockPar)
 	deltaVwoTmix = deltaVwoTmix(dVwoTmixpar)
 
 	print "deltaVwoTmix", deltaVwoTmix
+	print "deltaV2", deltaV2
 	print "mp", mp
-	print "deltaV", deltaV
+	print "deltaV1", deltaV1
 	print "Tmix", Tmix

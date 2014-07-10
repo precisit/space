@@ -13,8 +13,8 @@ def gravForce(m,r):
 re = 6371e3
 r = (re + 300000)*np.array([1.,0,0])
 m = 9000
-steps = 1000.
-ttot = 15000.
+steps = 10000.
+ttot = 30000.
 t = 0
 dt = ttot/steps
 i = 0
@@ -23,8 +23,10 @@ rsave = np.empty([steps,3])
 vsave = np.empty([steps,3])
 
 while (i < steps) :
-	if (t>3500 and t<3600):										#initiate burn at 70% of elapsed test time
-		a = gravForce(m,r)/m +20*np.array([0.,0.,1.])#10*v/(math.sqrt(np.dot(v,v)))
+	if (t>3500 and t<3600):										#
+		a = gravForce(m,r)/m +10*v/(math.sqrt(np.dot(v,v)))#10*v/(math.sqrt(np.dot(v,v)))     20*np.array([0.,0.,1.])
+	elif (t>6500 and t<6600):										#
+		a = gravForce(m,r)/m +10*v/(math.sqrt(np.dot(v,v)))
 	else:
 		a = gravForce(m,r)/m
 	
@@ -52,6 +54,7 @@ x = re * np.outer(np.cos(theta), np.sin(phi))
 y = re * np.outer(np.sin(theta), np.sin(phi))
 z = re * np.outer(np.ones(np.size(theta)), np.cos(phi))
 
-ax.scatter(rsave[:,0],rsave[:,1],rsave[:,2],s=2,c='r')
+plotStLen = 50 
+ax.scatter(rsave[0:steps-1:plotStLen,0],rsave[0:steps-1:plotStLen,1],rsave[0:steps-1:plotStLen,2],s=20,c='r')
 ax.plot_surface(x,y,z)
 plt.show()
