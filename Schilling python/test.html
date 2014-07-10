@@ -139,7 +139,7 @@ var jsonObj = JSON.stringify(myNumbers);
 $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log('deltaVwoTmix/ deltaV', result.deltaVwoTmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('deltaValt/ deltaValt', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
