@@ -24,11 +24,11 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
-$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
+//$.post("/test", jsonObj, function( result ) {
+$.post("/test", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log(result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('test/ dVtot', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -49,11 +49,11 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
-$.post("http://hans-erik.simulations.io/deltaV", jsonObj, function( result ) {
+//$.post("/test", jsonObj, function( result ) {
+$.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log(result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('deltaV/ dVtot', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -71,11 +71,11 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
-$.post("http://hans-erik.simulations.io/Tmix", jsonObj, function( result ) {
+//$.post("/test", jsonObj, function( result ) {
+$.post("/Tmix", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log(result.Tmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('Tmix/ Tmix', result.Tmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -95,11 +95,11 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
-$.post("http://hans-erik.simulations.io/rocketCapability", jsonObj, function( result ) {
+//$.post("/test", jsonObj, function( result ) {
+$.post("/rocketCapability", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log(result.mp); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('rocketCapability/ mp', result.mp); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -115,11 +115,11 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("http://hans-erik.simulations.io/test", jsonObj, function( result ) {
-$.post("http://hans-erik.simulations.io/deltaVwoTmix", jsonObj, function( result ) {
+//$.post("/test", jsonObj, function( result ) {
+$.post("/deltaVwoTmix", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log(result.deltaVwoTmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('deltaVwoTmix/ deltaVwoTmix', result.deltaVwoTmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
