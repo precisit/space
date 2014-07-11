@@ -16,8 +16,15 @@ def deltaV(orbPar):
 	if ("Tmix" in orbPar):
 		dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
 		dVtot = dVobj.deltaVtot()
-	else:
+	elif(("mw1" in orbPar and "mw2" in orbPar) or ("mb1" in orbPar and "mb2" in orbPar)):
 		dVtot = deltaVwoTmix(orbPar)
+	else:
+		deltaVp = schilling.Vcirc(orbPar["alt"]) + 1500
+		Isp = 320
+		A0 = 11
+		Time = ascTime.T3s(deltaVp,Isp,A0)
+		dVobj = schilling.DeltaVtot(500, orbPar["alt"], orbPar["lat"], orbPar["incl"])
+		dVtot = dVobj.deltaVtot()
 	return dVtot
 
 	# Requires lots of parameters for the rocket. Also does the calculations for the mass of the fuel and approximates
@@ -67,6 +74,8 @@ if __name__ == "__main__":
 	mp = mpSolver(mpsolvePar)
 	deltaV1 = deltaV(orbPar)
 	deltaV2 = deltaV( dVwoTmixpar )
+	del orbPar['Tmix']
+	deltaV3 = deltaV(orbPar)
 	Tmix = Tmix(rockPar)
 	deltaVwoTmix = deltaVwoTmix(dVwoTmixpar)
 
@@ -75,3 +84,4 @@ if __name__ == "__main__":
 	print "mp", mp
 	print "deltaV1", deltaV1
 	print "Tmix", Tmix
+	print "deltaV3", deltaV3

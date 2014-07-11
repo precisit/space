@@ -17,7 +17,7 @@ def Ta(m1b, Isp1SL, T1, m2b, Isp2V, T2, ssT):
 
 # Calculates the ascention time according to eq.4 in Schilling
 def T3s(deltaVp, Isp, A0):
-	value = 3*(1-math.exp(-0.333*(deltaVp+1500)/(9.81*Isp)))*9.81*Isp/A0
+	value = 3*(1-math.exp(-0.333*(deltaVp)/(9.81*Isp)))*9.81*Isp/A0
 	print "T3s", value
 	return value # deltav + 1500
 
