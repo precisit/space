@@ -51,6 +51,7 @@ class DeltaVHandler(tornado.web.RequestHandler):
 
     def post(self):
         indata = json.loads(self.request.body)
+        #indata.firstStage.wetMass #From meeting
         response = {}
         response['dVtot'] = mainschilling.deltaV(indata)
         self.write(json.dumps(response))
