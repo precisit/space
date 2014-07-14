@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import integrate
 from matplotlib.pylab import *
+from matplotlib import animation
 import matplotlib.pyplot as plt
 import scipy.constants as consts
 from mpl_toolkits.mplot3d import Axes3D
@@ -12,8 +13,9 @@ to the rocket, such as thrust, thrust vectoring, mass loss, varying air density 
 
 """
 
-Me = 5.97219e24 			# Earth mass [kg]
-Re = 6371000				# Earth radius [m]
+Me = 5.97219e24 				# Earth mass [kg]
+Re = 6371000					# Earth radius [m]
+We = 2*math.pi/(24*60*60)		# Earth rotational velocity
 
 def projectileDrag(t,w):
 	"""
@@ -25,7 +27,7 @@ def projectileDrag(t,w):
 
 	# Physical params
 	g = consts.g 			# Just g [m/s^2]
-	rho = 0 				# Air density [kg/m^3]
+	rho = 0.3 				# Air density [kg/m^3]
 	Cd = 0.25				# Drag coeff. pulled out of nowhere
 	
 	# Rocket params
@@ -36,10 +38,15 @@ def projectileDrag(t,w):
 	
 	Mwet = 500000			# Total rocket mass (wet mass) [kg]
 	Mfuel = 470000			# Fuel mass	[kg]
-	Isp = 350				# Specific impulse
+	Isp = 330				# Specific impulse
 	Thr = 5885e3			# Thrust [N]
 	mdot = Thr/(Isp*g)		# Fuel burn rate [kg/s]
 	angle = 90*math.pi/180 	# Thrust angle - temporary
+
+	#Launch params
+	latDeg = 28					# Launch latitude in degrees
+	lat = latDeg*math.pi/180	# Degrees to radians
+	initV = We*Re*cos(lat)		# Initial velocity contribution due to earth rotation
 	"""
 	mdot = 100				# Fuel burn rate [kg/s]
 	Vex = 5500  			# Exhaus velocity of burnt fuel [m/s]
@@ -47,7 +54,7 @@ def projectileDrag(t,w):
 	#End params
 
 	Xdot = w[0] 			# x-pos
-	xdot = w[1]				# x-vel
+	xdot = w[1]	+initV		# x-vel
 	Ydot = w[2]				# y-pos
 	ydot = w[3]				# y-vel
 	Zdot = w[4]				# z-pos
@@ -92,8 +99,8 @@ if __name__=='__main__':
  	x0 = 0 				# initial x-position
  	y0 = Re  			# initial y-position
  	z0 = 0 				# initial z-position
- 	xdot0 = 2			#initial x-velocity
- 	ydot0 = 1			#initial y-velocity
+ 	xdot0 = 1			#initial x-velocity
+ 	ydot0 =1			#initial y-velocity
  	zdot0 = 0			#initial z-velocity
  	initial_conds = [x0, xdot0, y0, ydot0, z0, zdot0]
 
@@ -145,7 +152,7 @@ if __name__=='__main__':
 	#Plot earth-size sphere
 	phi = np.linspace(0, 2 * np.pi, 100)
 	theta = np.linspace(0, np.pi, 100)
-	xm = Re * np.outer(np.cos(phi), np.sin(theta))	q
+	xm = Re * np.outer(np.cos(phi), np.sin(theta))
 	ym = Re * np.outer(np.sin(phi), np.sin(theta))
 	zm = Re * np.outer(np.ones(np.size(phi)), np.cos(theta))
 	ax.plot_surface(xm, ym, zm)
@@ -156,6 +163,7 @@ if __name__=='__main__':
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
 	plt.show()
+	
 	"""
 
 	""" Plotting 2D"""
@@ -164,13 +172,10 @@ if __name__=='__main__':
 	circ = plt.Circle((0,0), radius=Re, color='b')
 	ax.add_patch(circ)
 	plt.scatter(rx,ry, marker='.',color='black', s=10)
-
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
 	ax2.plot(t, velocity)
 	plt.show()
-
-
 
 
 
