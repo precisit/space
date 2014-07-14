@@ -18,11 +18,11 @@ Tbraupp = 5
 Pbraupp = 7
 
 # change what property you want to export a function of
-proplow = Densbralow 
-propupp = Densbraupp
+proplow = Tbralow 
+propupp = Tbraupp
 # change what the name of the data should be
-tck1name = 'Denstck1.pk1'
-tck2name = 'Denstck2.pk1'
+tck1name = 'Ttck1.pk1'
+tck2name = 'Ttck2.pk1'
 
 # loading data from http://www.braeunig.us/space/atmos.htm 
 # model of the atmosphere. using values for mean solar activity
@@ -53,7 +53,7 @@ plt.plot(x2,interpolate.splev(x2,tck2))
 
 plt.show()
 
-# function using both the upper and lower atmosphere to return propsure. 
+# function using both the upper and lower atmosphere to return property. 
 # this function will exist in atmofunc.py aswell
 def func(alt):
 	if (alt<84852):
