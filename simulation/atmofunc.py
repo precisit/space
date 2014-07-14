@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import pickle
 import math
 
+Re = 6371000
+
 Ptck1 = pickle.load(open('Pressuretck1.pk1'))
 Ptck2 = pickle.load(open('Pressuretck2.pk1'))
 
@@ -49,19 +51,32 @@ def dragCoefficient(v,alt):
 	return CD
 	
 	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
-def dragForce(v,alt,A=113):
+def dragForce(vi,ri,A=113):
+	vr, alt = inertToSurf(vi,ri)
+	v = np.linalg.norm(vr)
 	CD = dragCoefficient(v,alt)
-	print CD
+	
 	rho = density(alt)
-	print rho
+	
 	FD = 0.5*CD*rho*v**2
-	print FD
 	return FD
 
+def inertToSurf(vi,ri):
+	omega = np.array([0,0,math.pi*2./(24*3600)])
+	vr = vi-np.cross(omega,ri)
+	print vr
+	alt = np.linalg.norm(ri)-Re
+	return vr,alt
+
+
 if __name__=="__main__":
-	uppl = 400
-	alt = np.linspace(0,200000,uppl)
-	v = np.linspace(0,9000,uppl)
+	uppl = 200
+	r = np.zeros([uppl,3])
+	v = np.zeros([uppl,3])
+	r[:,0] = np.linspace(0,1000000,uppl) + Re
+	v[:,0] = np.linspace(0,9000,uppl)
+	v[:,1] = 463.3*np.ones(uppl)
+	
 	
 	P = np.zeros(uppl)
 	dens = np.zeros(uppl)
@@ -72,24 +87,32 @@ if __name__=="__main__":
 
 
 
-	for i in range(np.shape(alt)[0]):
-		
+	for i in range(np.shape(FD)[0]):
+		"""
 		P[i] = pressure(alt[i])
 		dens[i] = density(alt[i])
 		T[i] = temp(alt[i])
 		CD[i] = dragCoefficient(v[i],alt[i])
-		FD[i] = dragForce(v[i],alt[i])
+		"""
+		FD[i] = dragForce(v[i,:],r[i,:])
 		
 		
 
-	
+	"""
 	plt.plot(alt,P)
+	plt.title('pressure')
 	plt.show()
 	plt.plot(alt,dens)
+	plt.title('dens')
 	plt.show()
 	plt.plot(alt,T)
+	plt.title('temp')
 	plt.show()
 	plt.plot(alt,CD)
+	plt.title('dragCoefficient')
 	plt.show()
-	plt.plot(alt,FD)
+	"""
+	plt.plot(r[:,0],FD)
+	
+	plt.title('dragForce')
 	plt.show()
