@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 import pickle
 import math
 
-Ptck1 = pickle.load(open('Pressuretck1.pk1','rb'))
-Ptck2 = pickle.load(open('Pressuretck2.pk1','rb'))
+Ptck1 = pickle.load(open('Pressuretck1.pk1'))
+Ptck2 = pickle.load(open('Pressuretck2.pk1'))
 
-Denstck1 = pickle.load(open('Denstck1.pk1','rb'))
-Denstck2 = pickle.load(open('Denstck2.pk1','rb'))
+Denstck1 = pickle.load(open('Denstck1.pk1'))
+Denstck2 = pickle.load(open('Denstck2.pk1'))
 
-Ttck1 = pickle.load(open('Ttck1.pk1','rb'))
-Ttck2 = pickle.load(open('Ttck2.pk1','rb'))
+Ttck1 = pickle.load(open('Ttck1.pk1'))
+Ttck2 = pickle.load(open('Ttck2.pk1'))
 
-dragCoefftck = pickle.load(open('dragCoefftck.pk1','rb'))
+dragCoefftck = pickle.load(open('dragCoefftck.pk1'))
 
 def pressure(alt):
 	if (alt<84852):
@@ -48,7 +48,8 @@ def dragCoefficient(v,alt):
 	CD = interpolate.splev(mach,dragCoefftck)
 	return CD
 	
-def dragForce(v,alt,A):
+	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
+def dragForce(v,alt,A=113):
 	CD = dragCoefficient(v,alt)
 	print CD
 	rho = density(alt)
@@ -77,7 +78,7 @@ if __name__=="__main__":
 		dens[i] = density(alt[i])
 		T[i] = temp(alt[i])
 		CD[i] = dragCoefficient(v[i],alt[i])
-		FD[i] = dragForce(v[i],alt[i],3)
+		FD[i] = dragForce(v[i],alt[i])
 		
 		
 
