@@ -18,6 +18,12 @@ Me = 5.97219e24 								# Earth mass [kg]
 Re = 6371000									# Earth radius [m]
 We = np.array([0,0,2*math.pi/(24*60*60)])		# Earth rotational velocity vector
 
+# vector for saving data
+dragForceData = []
+ThrData = []
+timeData = []
+altData = []
+
 def projectileDrag(t,w):
 	"""
 	Function for modelling a projectile motion with thrust, variable mass and drag.
@@ -27,13 +33,13 @@ def projectileDrag(t,w):
 	"""
 	
 	# Rocket parameters
-	Mwet = 500000				# Total rocket mass (wet mass) [kg]
-	Mfuel = 470000				# Fuel mass	[kg]
-	Isp = 400					# Specific impulse
-	Thr = 5885e3				# Thrust [N]
-	mdot = Thr/(Isp*consts.g)		# Fuel burn rate [kg/s]
-	angle = (+0.3*t+90)*math.pi/180 	# Thrust angle - temporary
-
+	Mwet = 402000				# Total rocket mass (wet mass) [kg]
+	Mfuel = Mwet-16000-3900				# Fuel mass	[kg]
+	IspVAC = 320					# Specific impulse in vaacum [s]
+	ThrSL = 5885e3				# Thrust at sealevel [N]
+	mdot = ThrSL/(IspVAC*consts.g)		# Fuel burn rate [kg/s]
+	angle = (+0.002*t**2+0.2*t+90)*math.pi/180 	# Thrust angle - temporary
+	Ae = atmofunc.Ae(IspVAC,mdot,ThrSL) # Area of exit nozzle
 	"""
 	mdot = 100				# Fuel burn rate [kg/s]
 	Vex = 5500  			# Exhaus velocity of burnt fuel [m/s]
@@ -54,7 +60,13 @@ def projectileDrag(t,w):
 
 	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
 	grav = gravAcc(positions) 							# Gravitational acceleration
+	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
 	
+	dragForceData.append(dragF)
+	ThrData.append(Thr)
+	timeData.append(t)
+	altData.append(np.linalg.norm(positions) - Re)
+
 	return [velocities[0], (1/Mcurr)*(-dragF*Vunit[0]+Thr*math.cos(angle))-grav[0],
 			velocities[1], (1/Mcurr)*(-dragF*Vunit[1]+Thr*math.sin(angle))-grav[1],
 			velocities[2], (1/Mcurr)*(-dragF*Vunit[2]+0*Thr*Vunit[2])-grav[2]]
@@ -68,8 +80,8 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 10000;
-	delta_t =1;
+	t_final = 50000;
+	delta_t =0.5;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
@@ -134,7 +146,7 @@ if __name__=='__main__':
 	"""End integration """
 
 	"""Plotting 3D"""
-	"""
+	
 	fig = plt.figure()
 	ax = Axes3D(fig)
 	ax.scatter(rx,ry,rz, marker='.')
@@ -150,13 +162,12 @@ if __name__=='__main__':
 	ax.set_xlabel('X-axis')
 	ax.set_ylabel('Y-axis')
 	ax.set_zlabel('Z-axis')
-
+	"""
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
 	ax2.plot(t, velocity, t, altitude)
 	plt.show()
 	"""
-
 	""" Plotting 2D"""
 	
 	fig = plt.figure()
@@ -170,6 +181,20 @@ if __name__=='__main__':
 	ax2.set_xlabel('X-axis')
 	ax2.set_ylabel('Y-axis')
 	plt.show()
+
+	plt.plot(timeData,altData)
+	plt.title('alt vs time')
+	plt.show()
+	plt.plot(timeData,dragForceData)
+	plt.title('dragForce vs time')
+	plt.show()
+	plt.plot(timeData,ThrData)
+	plt.title('Thr vs time')
+	plt.show()
+	plt.plot(altData,ThrData)
+	plt.title('thrust vs alt')
+	plt.show()
+
 	
 
 
