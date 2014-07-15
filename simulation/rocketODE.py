@@ -54,7 +54,8 @@ def projectileDrag(t,w):
 	ydot = w[3]				# y-vel
 	Zdot = w[4]				# z-pos
 	zdot = w[5]				# z-vel
-
+	v = np.array([xdot, ydot, zdot])
+	pos = np.array([Xdot,Ydot,Zdot])
 	Mburnt = mdot*t							# burnt fuel fuel mass at time t [kg]
  	Mcurr = Mwet-Mburnt	 					# Current mass
  	# If no fuel left, cut mdot
@@ -62,9 +63,9 @@ def projectileDrag(t,w):
 		mdot = 0
 		Mcurr = Mwet-Mfuel
 
-	V = norm([xdot, ydot, zdot])				# Absolute value of the velocity
+	V = norm(v)										# Absolute value of the velocity
 	altitude = norm([Xdot, Ydot, Zdot]) 		# Altitude
-	dragF = atmofunc.dragForce(V, altitude)		# Magnitude of the drag force
+	dragF = atmofunc.dragForce(V, pos)		# Magnitude of the drag force
 	Vunit = [xdot/V, ydot/V, zdot/V]			# Unit velocity vector
 	grav = gravAcc([Xdot, Ydot, Zdot]) 			# Gravitational acceleration
 
