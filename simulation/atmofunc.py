@@ -3,8 +3,10 @@ from scipy import interpolate
 import matplotlib.pyplot as plt
 import pickle
 import math
+import scipy.constants as constants
 
 Re = 6371000
+omega = np.array([0,0,math.pi*2./(24*3600)])
 
 Ptck1 = pickle.load(open('Pressuretck1.pk1'))
 Ptck2 = pickle.load(open('Pressuretck2.pk1'))
@@ -60,11 +62,26 @@ def dragForce(vi,ri,A=113):
 	return FD
 
 def inertToSurf(vi,ri):
-	omega = np.array([0,0,math.pi*2./(24*3600)])
-	vr = vi-np.cross(omega,ri)
-	print vr
-	alt = np.linalg.norm(ri)-Re
+	vr = inertToSurfVel(vi,ri)
+	alt = inertToAlt(ri)
 	return vr,alt
+
+def inertToAlt(ri):
+	alt = np.linalg.norm(ri)-Re
+	return alt
+
+def inertToSurfVel(vi,ri):
+	vr = vi-np.cross(omega,ri)
+	return vr
+
+def thrustEff(Ispvac,Ae,r,mdot):
+	alt = inertToAlt(r)
+	Teff = Ispvac*constants.g*mdot - Ae*pressure(alt)
+	return Teff
+
+def Ae(Ispvac,mdotmax,FSL):
+	return (Ispvac*constants.g*mdotmax-FSL)/101325 
+
 
 
 if __name__=="__main__":
@@ -81,7 +98,9 @@ if __name__=="__main__":
 	T = np.zeros(uppl)
 	CD = np.zeros(uppl)
 	FD = np.zeros(uppl)
-
+	Thrust = np.zeros(uppl)
+	Ae = Ae(320,236.047,654000)
+	print Ae
 
 
 
@@ -93,6 +112,7 @@ if __name__=="__main__":
 		CD[i] = dragCoefficient(v[i],alt[i])
 		"""
 		FD[i] = dragForce(v[i,:],r[i,:])
+		Thrust[i] = thrustEff(320,Ae,r[i,:],236.047)
 		
 		
 
@@ -113,4 +133,7 @@ if __name__=="__main__":
 	plt.plot(r[:,0],FD)
 	
 	plt.title('dragForce')
+	plt.show()
+
+	plt.plot(r[:,0],Thrust)
 	plt.show()
