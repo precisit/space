@@ -61,6 +61,8 @@ def dragForce(vi,ri,A=113):
 	FD = 0.5*CD*rho*v**2
 	return FD
 
+
+
 def inertToSurf(vi,ri):
 	vr = inertToSurfVel(vi,ri)
 	alt = inertToAlt(ri)
@@ -74,6 +76,8 @@ def inertToSurfVel(vi,ri):
 	vr = vi-np.cross(omega,ri)
 	return vr
 
+
+	# efficient thrust as a function of position and current massflow. Ae is the area of the nozzle exit.
 def thrustEff(Ispvac,Ae,r,mdot):
 	alt = inertToAlt(r)
 	Teff = Ispvac*constants.g*mdot - Ae*pressure(alt)
@@ -86,17 +90,20 @@ def Ae(Ispvac,mdotmax,FSL):
 
 if __name__=="__main__":
 	uppl = 200
+	altitude = 200000
 	r = np.zeros([uppl,3])
 	v = np.zeros([uppl,3])
-	r[:,0] = np.linspace(0,1000000,uppl) + Re
+	alt = np.linspace(0,altitude,uppl)
+	r[:,0] = np.linspace(0,altitude,uppl) + Re
 	v[:,0] = np.linspace(0,9000,uppl)
 	v[:,1] = 463.3*np.ones(uppl)
 	
 	
+
 	P = np.zeros(uppl)
 	dens = np.zeros(uppl)
 	T = np.zeros(uppl)
-	CD = np.zeros(uppl)
+	#CD = np.zeros(uppl)
 	FD = np.zeros(uppl)
 	Thrust = np.zeros(uppl)
 	Ae = Ae(320,236.047,654000)
@@ -105,18 +112,18 @@ if __name__=="__main__":
 
 
 	for i in range(np.shape(FD)[0]):
-		"""
+		
 		P[i] = pressure(alt[i])
 		dens[i] = density(alt[i])
 		T[i] = temp(alt[i])
-		CD[i] = dragCoefficient(v[i],alt[i])
-		"""
+		#CD[i] = dragCoefficient(v[i],alt[i])
+		
 		FD[i] = dragForce(v[i,:],r[i,:])
 		Thrust[i] = thrustEff(320,Ae,r[i,:],236.047)
 		
 		
 
-	"""
+	
 	plt.plot(alt,P)
 	plt.title('pressure')
 	plt.show()
@@ -126,14 +133,15 @@ if __name__=="__main__":
 	plt.plot(alt,T)
 	plt.title('temp')
 	plt.show()
-	plt.plot(alt,CD)
-	plt.title('dragCoefficient')
-	plt.show()
-	"""
+	#plt.plot(alt,CD)
+	#plt.title('dragCoefficient')
+	#plt.show()
+	
 	plt.plot(r[:,0],FD)
 	
 	plt.title('dragForce')
 	plt.show()
 
 	plt.plot(r[:,0],Thrust)
+	plt.title('Thrust')
 	plt.show()
