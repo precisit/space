@@ -47,9 +47,13 @@ def mpSolver(mpsolvePar):
 		mpsolvePar["Isp2V"], mpsolvePar["T2"], mpsolvePar["alt"], mpsolvePar["lat"], mpsolvePar["incl"], mpsolvePar["ssT"])
 	return mp
 
+	# Calculates deltav without needing Tmix. Needs other parameters for the rocket though. Makes an estimation of deltaVP needed
+	# for schillings Tmix using townsends method. 
 def deltaVwoTmix(param):
-	param["mb1"] = param["mw1"]-param["md1"]-param["mr1"]
-	param["mb2"] = param["mw2"]-param["md2"]-param["mr2"]
+	if ("mb1" not in param and mb2 not in param):
+		param["mb1"] = param["mw1"]-param["md1"]-param["mr1"]
+		param["mb2"] = param["mw2"]-param["md2"]-param["mr2"]
+	
 	param["A0"] = param["T1"]/(param["mw1"] + param["mw2"] + param["mp"])
 	Ta = ascTime.Ta(param["mb1"], param["Isp1SL"], param["T1"], param["mb2"], param["Isp2V"], param["T2"], param["ssT"])
 	dVobjTa = schilling.DeltaVtot(Ta, param["alt"], param["lat"], param["incl"])
