@@ -51,11 +51,11 @@ def dragCoefficient(v,alt):
 	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
 def dragForce(v,alt,A=113):
 	CD = dragCoefficient(v,alt)
-	print CD
+	#print CD
 	rho = density(alt)
-	print rho
+	#print rho
 	FD = 0.5*CD*rho*v**2
-	print FD
+	#print FD
 	return FD
 
 if __name__=="__main__":

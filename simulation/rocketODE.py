@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import scipy.constants as consts
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.integrate import odeint
+import atmofunc
 
 """
 This is supposed to be an extension of simpleODE, with more forces and function added
@@ -30,18 +31,12 @@ def projectileDrag(t,w):
 	rho = 0.3 				# Air density [kg/m^3]
 	Cd = 0.25				# Drag coeff. pulled out of nowhere
 	
-	# Rocket params
-	r = 0.5 				# Radius of front [m]
-	A = math.pi*r**2 		# Front-facing cross sectional area area [m^2]
-	Cd = 0.6 				# Drag coefficient - pulled out of nowhere
-	beta = 0.5*A*rho*Cd
-	
 	Mwet = 500000			# Total rocket mass (wet mass) [kg]
 	Mfuel = 470000			# Fuel mass	[kg]
-	Isp = 330				# Specific impulse
+	Isp = 340				# Specific impulse
 	Thr = 5885e3			# Thrust [N]
 	mdot = Thr/(Isp*g)		# Fuel burn rate [kg/s]
-	angle = 90*math.pi/180 	# Thrust angle - temporary
+	angle = (-0.35*t+90)*math.pi/180 	# Thrust angle - temporary
 
 	#Launch params
 	latDeg = 28					# Launch latitude in degrees
@@ -54,7 +49,7 @@ def projectileDrag(t,w):
 	#End params
 
 	Xdot = w[0] 			# x-pos
-	xdot = w[1]	+initV		# x-vel
+	xdot = w[1]				# x-vel
 	Ydot = w[2]				# y-pos
 	ydot = w[3]				# y-vel
 	Zdot = w[4]				# z-pos
@@ -67,18 +62,15 @@ def projectileDrag(t,w):
 		mdot = 0
 		Mcurr = Mwet-Mfuel
 
-	V = norm([xdot, ydot, zdot])			# Absolute value of the velocity	
-	Vunit = [xdot/V, ydot/V, zdot/V]		# Unit velocity vector
-	grav = gravAcc([Xdot, Ydot, Zdot])
+	V = norm([xdot, ydot, zdot])				# Absolute value of the velocity
+	altitude = norm([Xdot, Ydot, Zdot]) 		# Altitude
+	dragF = atmofunc.dragForce(V, altitude)		# Magnitude of the drag force
+	Vunit = [xdot/V, ydot/V, zdot/V]			# Unit velocity vector
+	grav = gravAcc([Xdot, Ydot, Zdot]) 			# Gravitational acceleration
 
-	"""Calculates thrust from the mass flow and echaust velocity """ """
-	return [xdot, (1/Mcurr)*(-beta*V*xdot+mdot*Vex*Vunit[0])-grav[0],
-			ydot, (1/Mcurr)*(-beta*V*ydot+mdot*Vex*Vunit[1])-grav[1],
-			Zdot, (1/Mcurr)*(-beta*V*zdot+mdot*Vex*Vunit[2])-grav[2]] """
-
-	return [xdot, (1/Mcurr)*(-beta*V*xdot+Thr*math.cos(angle))-grav[0],
-			ydot, (1/Mcurr)*(-beta*V*ydot+Thr*math.sin(angle))-grav[1],
-			Zdot, (1/Mcurr)*(-beta*V*zdot+0*Thr*Vunit[2])-grav[2]]
+	return [xdot, (1/Mcurr)*(-dragF*Vunit[0]+Thr*math.cos(angle))-grav[0],
+			ydot, (1/Mcurr)*(-dragF*Vunit[1]+Thr*math.sin(angle))-grav[1],
+			Zdot, (1/Mcurr)*(-dragF*Vunit[2]+0*Thr*Vunit[2])-grav[2]]
 
 def gravAcc(pos):
 	""" Used to calculate the gravity, varying with position """
@@ -91,8 +83,8 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 1000;
-	delta_t =1;
+	t_final = 100000;
+	delta_t =2;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
@@ -137,6 +129,9 @@ if __name__=='__main__':
 
 	 	rz[i] 	= r.y[4]
 	 	velz[i] = r.y[5]
+
+	 	if norm([rx[i], ry[i], rz[i]])-Re < 0:
+	 		break
 	 	i+=1
 
 	velocity = np.zeros((numsteps,1))
