@@ -29,10 +29,10 @@ def projectileDrag(t,w):
 	# Rocket parameters
 	Mwet = 500000				# Total rocket mass (wet mass) [kg]
 	Mfuel = 470000				# Fuel mass	[kg]
-	Isp = 500					# Specific impulse
+	Isp = 400					# Specific impulse
 	Thr = 5885e3				# Thrust [N]
 	mdot = Thr/(Isp*consts.g)		# Fuel burn rate [kg/s]
-	angle = (-0.25*t+90)*math.pi/180 	# Thrust angle - temporary
+	angle = (+0.3*t+90)*math.pi/180 	# Thrust angle - temporary
 
 	"""
 	mdot = 100				# Fuel burn rate [kg/s]
@@ -52,8 +52,8 @@ def projectileDrag(t,w):
 		mdot = 0
 		Mcurr = Mwet-Mfuel
 
-	dragF = atmofunc.dragForce(velocities, positions)# Magnitude of the drag force
-	grav = gravAcc(positions) 						# Gravitational acceleration
+	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
+	grav = gravAcc(positions) 							# Gravitational acceleration
 	
 	return [velocities[0], (1/Mcurr)*(-dragF*Vunit[0]+Thr*math.cos(angle))-grav[0],
 			velocities[1], (1/Mcurr)*(-dragF*Vunit[1]+Thr*math.sin(angle))-grav[1],
@@ -68,8 +68,8 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 1000;
-	delta_t =10;
+	t_final = 10000;
+	delta_t =1;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
@@ -126,13 +126,15 @@ if __name__=='__main__':
 	 	
 	 	i+=1
 
-
 	velocity = np.zeros((numsteps,1))
+	altitude = np.zeros((numsteps,1))
 	for i in range(len(t)):
 		velocity[i] = sqrt(velx[i]**2+vely[i]**2+velz[i]**2)
+		altitude[i] = sqrt(rx[i]**2+ry[i]**2+rz[i]**2)-Re
 	"""End integration """
 
 	"""Plotting 3D"""
+	"""
 	fig = plt.figure()
 	ax = Axes3D(fig)
 	ax.scatter(rx,ry,rz, marker='.')
@@ -151,11 +153,12 @@ if __name__=='__main__':
 
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
+	ax2.plot(t, velocity, t, altitude)
 	plt.show()
-	
+	"""
 
 	""" Plotting 2D"""
-	"""
+	
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
@@ -164,8 +167,10 @@ if __name__=='__main__':
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
 	ax2.plot(t, velocity)
+	ax2.set_xlabel('X-axis')
+	ax2.set_ylabel('Y-axis')
 	plt.show()
-	"""
+	
 
 
 
