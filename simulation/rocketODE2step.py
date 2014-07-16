@@ -67,12 +67,10 @@ def rocketfunc(t,w):
 		mdot = mdot2
 		Ae = Ae2
 
-	angle = w[6]
-
 	#angle = (0.001*t**2+0.0*t+90)*math.pi/180 	# Thrust angle - temporary
 	positions = np.array([w[0], w[2], w[4]]) 	# Positions
 	velocities = np.array([w[1], w[3], w[5]]) 	# Velocities
-
+	alt = norm(positions)-Re
 	Vunit = velocities/norm(velocities) 			# Unit velocity vector
 
 	Mburnt = mdot*t									# burnt fuel fuel mass at time t [kg]
@@ -89,25 +87,28 @@ def rocketfunc(t,w):
 	grav = gravAcc(positions) 							# Gravitational acceleration
 	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
 	
-	Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
+	#Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
+	
+
+	if alt <= 15300:
+		Thrunit = positions/norm(positions)
+	else:
+		Thrunit = Vunit
+		#dangle_dt = 0
+	print Thr*Thrunit
+	print "Vunit"
+	print velocities
+	print ""
 	accelerations = (1/Mcurr)*(-dragF*Vunit + Thr*Thrunit) - grav
 
-	if norm(positions)-Re <= 10000:
-		dangle_dt = 0
-	else:
-		dangle_dt = -norm(grav)/norm(velocities)*math.cos(angle)
-		#dangle_dt = 0
-
-	print angle
 	dragForceData.append(dragF)
 	ThrData.append(Thr)
 	timeData.append(t)
-	altData.append(np.linalg.norm(positions) - Re)
+	altData.append(alt)
 
 	return [velocities[0], accelerations[0],
 			velocities[1], accelerations[1],
-			velocities[2], accelerations[2],
-			dangle_dt]
+			velocities[2], accelerations[2]]
 
 def gravAcc(pos):
 	""" Used to calculate the gravity, varying with position """
@@ -118,14 +119,14 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 1000;
-	delta_t =0.5;
+	t_final = 10000;
+	delta_t =1;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
 
 	#Initial launch params
-	latDeg = 0					# Launch latitude in degrees
+	latDeg = 90					# Launch latitude in degrees
 	longDeg = 90 					# Longitude
 	lat = latDeg*math.pi/180		# Degrees to radians
 	longi = longDeg*math.pi/180		# Radians
@@ -135,7 +136,7 @@ if __name__=='__main__':
 	 		math.sin(lat)]) 		# Initial position vector
 	initV = np.cross(We, initR)		# Initial velocity contribution due to earth rotation
 
- 	initial_conds = [initR[0], initV[0], initR[1], initV[1], initR[2], initV[2],90] # Initial condition to solver
+ 	initial_conds = [initR[0], initV[0], initR[1], initV[1], initR[2], initV[2]] # Initial condition to solver
 
  	"""Solve with odeint"""
  	#time = [t_final*float(i)/(numsteps) for i in range(int(numsteps))]
@@ -155,7 +156,7 @@ if __name__=='__main__':
   	velx = np.zeros((numsteps,1))
   	vely = np.zeros((numsteps,1))
   	velz = np.zeros((numsteps,1))
-  	angles = np.zeros((numsteps,1))
+
   	i=1
 
 	while r.successful() and i < numsteps:
@@ -170,8 +171,7 @@ if __name__=='__main__':
 
 	 	rz[i] 	= r.y[4]
 	 	velz[i] = r.y[5]
-	 	angles[i] = r.y[6]
-	 	print angles[i]
+
 	 	if norm([rx[i], ry[i], rz[i]])-Re < 0:
 	 		break
 	 	
@@ -232,8 +232,6 @@ if __name__=='__main__':
 	plt.show()
 	plt.plot(altData,ThrData)
 	plt.title('thrust vs alt')
-	plt.plot(t,angles)
-	plt.title('Angles vs time')
 	plt.show()
 
 	
