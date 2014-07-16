@@ -24,45 +24,69 @@ ThrData = []
 timeData = []
 altData = []
 
-def projectileDrag(t,w):
+# flag for current stage
+stage = 1
+
+# Rocket parameters
+Mwet1 = 402000				# Total rocket mass (wet mass) [kg]
+Mfuel1 = Mwet1-16000-3900				# Fuel mass	[kg]
+IspVAC1 = 320
+IspSL1 = 282					# Specific impulse in vaacum [s]
+ThrSL1 = 5885e3				# Thrust at sealevel [N]
+mdot1 = ThrSL1/(IspSL1*consts.g)		# Fuel burn rate [kg/s]
+Ae1 = atmofunc.Ae(IspVAC1,mdot1,ThrSL1) # Area of exit nozzle
+
+Mwet2 = 90720
+Mfuel2 = Mwet2-3200-182
+IspVAC2 = 345
+ThrVAC2 = 800000
+mdot2 = ThrVAC2/(IspVAC2*consts.g)
+Ae2 = Ae1
+
+Mp = 10000
+def rocketfunc(t,w):
 	"""
 	Function for modelling a projectile motion with thrust, variable mass and drag.
 
 	When this program gets RESTified, we probably should send the parameters below as 
 	input arguments.
 	"""
+	global stage
 	
-	# Rocket parameters
-	Mwet = 402000				# Total rocket mass (wet mass) [kg]
-	Mfuel = Mwet-16000-3900				# Fuel mass	[kg]
-	IspVAC = 320
-	IspSL = 282					# Specific impulse in vaacum [s]
-	ThrSL = 5885e3				# Thrust at sealevel [N]
-	mdot = ThrSL/(IspSL*consts.g)		# Fuel burn rate [kg/s]
-	angle = (+0.002*t**2+0.2*t+90)*math.pi/180 	# Thrust angle - temporary
-	Ae = atmofunc.Ae(IspVAC,mdot,ThrSL) # Area of exit nozzle
-	"""
-	mdot = 100				# Fuel burn rate [kg/s]
-	Vex = 5500  			# Exhaus velocity of burnt fuel [m/s]
-	"""
-	#End params
+	if (stage == 1):
+		Mwet = Mwet1 + Mwet2 + Mp
+		Mfuel = Mfuel1
+		IspVAC = IspVAC1
+		mdot = mdot1
+		Ae = Ae1
 
-	positions = np.array([w[0], w[2], w[4]]) 				# Positions
+	else:
+		Mwet = Mwet2 + Mp
+		Mfuel = Mfuel2
+		IspVAC = IspVAC2
+		mdot = mdot2
+		Ae = Ae2
+	
+	angle = (0.001*t**2+0.01*t+90)*math.pi/180 	# Thrust angle - temporary
+	positions = np.array([w[0], w[2], w[4]]) 	# Positions
 	velocities = np.array([w[1], w[3], w[5]]) 	# Velocities
 
-	Vunit = velocities/norm(velocities) 									# Unit velocity vector
+	Vunit = velocities/norm(velocities) 			# Unit velocity vector
 
-	Mburnt = mdot*t							# burnt fuel fuel mass at time t [kg]
- 	Mcurr = Mwet-Mburnt	 					# Current mass
+	Mburnt = mdot*t									# burnt fuel fuel mass at time t [kg]
+ 	Mcurr = Mwet-Mburnt	 							# Current mass
  	# If no fuel left, cut mdot
 	if Mburnt >= Mfuel:
-		mdot = 0
-		Mcurr = Mwet-Mfuel
+		if (stage ==1):
+			stage = 2
+		else:
+			mdot = 0
+			Mcurr = Mwet-Mfuel
 
 	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
 	grav = gravAcc(positions) 							# Gravitational acceleration
 	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
-	
+		
 	dragForceData.append(dragF)
 	ThrData.append(Thr)
 	timeData.append(t)
@@ -81,7 +105,7 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 50000;
+	t_final = 10000;
 	delta_t =0.5;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
@@ -106,7 +130,7 @@ if __name__=='__main__':
  	# sol2 = sol2.T
 
  	"""Solve with VODE"""
-  	r = integrate.ode(projectileDrag).set_integrator('vode', method='bdf')
+  	r = integrate.ode(rocketfunc).set_integrator('vode', method='bdf')
   	r.set_initial_value(initial_conds, t_start)
   	t = np.zeros((numsteps,1))
 
