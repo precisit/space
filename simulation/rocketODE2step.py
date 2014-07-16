@@ -66,8 +66,10 @@ def rocketfunc(t,w):
 		IspVAC = IspVAC2
 		mdot = mdot2
 		Ae = Ae2
-	
-	angle = (0.001*t**2+0.0*t+90)*math.pi/180 	# Thrust angle - temporary
+
+	angle = w[6]
+
+	#angle = (0.001*t**2+0.0*t+90)*math.pi/180 	# Thrust angle - temporary
 	positions = np.array([w[0], w[2], w[4]]) 	# Positions
 	velocities = np.array([w[1], w[3], w[5]]) 	# Velocities
 
@@ -90,6 +92,13 @@ def rocketfunc(t,w):
 	Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
 	accelerations = (1/Mcurr)*(-dragF*Vunit + Thr*Thrunit) - grav
 
+	if norm(positions)-Re <= 10000:
+		dangle_dt = 0
+	else:
+		dangle_dt = -norm(grav)/norm(velocities)*math.cos(angle)
+		#dangle_dt = 0
+
+	print angle
 	dragForceData.append(dragF)
 	ThrData.append(Thr)
 	timeData.append(t)
@@ -97,7 +106,8 @@ def rocketfunc(t,w):
 
 	return [velocities[0], accelerations[0],
 			velocities[1], accelerations[1],
-			velocities[2], accelerations[2]]
+			velocities[2], accelerations[2],
+			dangle_dt]
 
 def gravAcc(pos):
 	""" Used to calculate the gravity, varying with position """
@@ -108,7 +118,7 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 10000;
+	t_final = 1000;
 	delta_t =0.5;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
@@ -125,7 +135,7 @@ if __name__=='__main__':
 	 		math.sin(lat)]) 		# Initial position vector
 	initV = np.cross(We, initR)		# Initial velocity contribution due to earth rotation
 
- 	initial_conds = [initR[0], initV[0], initR[1], initV[1], initR[2], initV[2]] # Initial condition to solver
+ 	initial_conds = [initR[0], initV[0], initR[1], initV[1], initR[2], initV[2],90] # Initial condition to solver
 
  	"""Solve with odeint"""
  	#time = [t_final*float(i)/(numsteps) for i in range(int(numsteps))]
@@ -145,7 +155,7 @@ if __name__=='__main__':
   	velx = np.zeros((numsteps,1))
   	vely = np.zeros((numsteps,1))
   	velz = np.zeros((numsteps,1))
-
+  	angles = np.zeros((numsteps,1))
   	i=1
 
 	while r.successful() and i < numsteps:
@@ -160,7 +170,8 @@ if __name__=='__main__':
 
 	 	rz[i] 	= r.y[4]
 	 	velz[i] = r.y[5]
-	 	
+	 	angles[i] = r.y[6]
+	 	print angles[i]
 	 	if norm([rx[i], ry[i], rz[i]])-Re < 0:
 	 		break
 	 	
@@ -221,6 +232,8 @@ if __name__=='__main__':
 	plt.show()
 	plt.plot(altData,ThrData)
 	plt.title('thrust vs alt')
+	plt.plot(t,angles)
+	plt.title('Angles vs time')
 	plt.show()
 
 	
