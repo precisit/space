@@ -67,7 +67,7 @@ def rocketfunc(t,w):
 		mdot = mdot2
 		Ae = Ae2
 	
-	angle = (0.001*t**2+0.01*t+90)*math.pi/180 	# Thrust angle - temporary
+	angle = (0.001*t**2+0.0*t+90)*math.pi/180 	# Thrust angle - temporary
 	positions = np.array([w[0], w[2], w[4]]) 	# Positions
 	velocities = np.array([w[1], w[3], w[5]]) 	# Velocities
 
@@ -86,15 +86,18 @@ def rocketfunc(t,w):
 	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
 	grav = gravAcc(positions) 							# Gravitational acceleration
 	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
-		
+	
+	Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
+	accelerations = (1/Mcurr)*(-dragF*Vunit + Thr*Thrunit) - grav
+
 	dragForceData.append(dragF)
 	ThrData.append(Thr)
 	timeData.append(t)
 	altData.append(np.linalg.norm(positions) - Re)
 
-	return [velocities[0], (1/Mcurr)*(-dragF*Vunit[0]+Thr*math.cos(angle))-grav[0],
-			velocities[1], (1/Mcurr)*(-dragF*Vunit[1]+Thr*math.sin(angle))-grav[1],
-			velocities[2], (1/Mcurr)*(-dragF*Vunit[2]+0*Thr*Vunit[2])-grav[2]]
+	return [velocities[0], accelerations[0],
+			velocities[1], accelerations[1],
+			velocities[2], accelerations[2]]
 
 def gravAcc(pos):
 	""" Used to calculate the gravity, varying with position """
