@@ -77,7 +77,7 @@ def rocketfunc(t,w):
 	velocities = np.array([w[1], w[3], w[5]]) 	# Velocities
 	alt = norm(positions)-Re
 	Vunit = velocities/norm(velocities) 			# Unit velocity vector
-
+	Posunit = positions/norm(positions)				# Unit position vector 
 	Mburnt = mdot*t									# burnt fuel fuel mass at time t [kg]
  	Mcurr = Mwet-Mburnt	 							# Current mass
  	# If no fuel left, cut mdot
@@ -93,9 +93,9 @@ def rocketfunc(t,w):
 	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
 	
 	#Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
-	
+	dragunit = atmofunc.inertToSurf(Vunit,Posunit)
 	if alt <= 14740:
-		Thrunit = positions/norm(positions)
+		Thrunit = Posunit
 	else:
 		Thrunit = Vunit
 		#dangle_dt = 0
@@ -132,7 +132,7 @@ if __name__=='__main__':
  	"""initial params"""
 
 	#Initial launch params
-	latDeg = 0 					# Launch latitude in degrees
+	latDeg = 28 					# Launch latitude in degrees
 	longDeg = 90 					# Longitude
 	lat = latDeg*math.pi/180		# Degrees to radians
 	longi = longDeg*math.pi/180		# Radians
