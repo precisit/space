@@ -58,7 +58,7 @@ def dragForce(vi,ri,A=113):
 	v = np.linalg.norm(vr)
 	CD = dragCoefficient(v,alt)
 	rho = density(alt)
-	FD = 0.5*CD*rho*v**2
+	FD = 0.5*A*CD*rho*v**2
 	return FD
 
 
