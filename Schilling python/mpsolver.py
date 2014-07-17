@@ -12,7 +12,7 @@ class mpClass:
 	# Constructor that sets the "constant" values for the launch, such as the rockets different masses, thrust,
 	# the inclination, latitude and altitude of the orbit.
 	def __init__(self, mw1, md1, mr1, Isp1SL, Isp1V, T1, 
-				mw2, md2, mr2, Isp2V, T2, alt, lat, incl, ssT = 0):
+				mw2, md2, mr2, Isp2V, T2, alt, lat, incl, ssT):
 		self.mw1 = mw1
 		self.md1 = md1
 		self.mr1 = mr1
