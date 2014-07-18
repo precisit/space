@@ -7,9 +7,9 @@ ssT - Stage separation time [s].
 """
 
 # Calculates the total ascention time
-def Ta(m1b, Isp1SL, T1, m2b, Isp2V, T2, ssT): 
-	t1 = m1b*Isp1SL*9.81/T1
-	t2 = m2b*Isp2V*9.81/T2
+def Ta(m1b, Isp1, T1, m2b, Isp2, T2, ssT): 
+	t1 = m1b*Isp1*9.81/T1
+	t2 = m2b*Isp2*9.81/T2
 	return t1 + t2 + ssT
 
 # Calculates the ascention time according to eq.4 in Schilling

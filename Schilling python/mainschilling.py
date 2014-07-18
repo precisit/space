@@ -66,6 +66,7 @@ def Tmix(rockPar):
 			print "Isp1V = 1.1*Isp1SL", 
 
 	if (gotMb):
+		
 		Tmix = ascTime.Tmix(rockPar["mb1"], rockPar["Isp1SL"], rockPar["T1"], rockPar["mb2"], rockPar["Isp2V"], 
 						rockPar["T2"], rockPar["deltaVp"], rockPar["Isp1V"], rockPar["A0"], rockPar["ssT"])
 		"Tmix calculated by ascTime.Tmix", Tmix
@@ -108,5 +109,15 @@ if __name__ == "__main__":
 	mp = mpSolver(mpsolvePar)
 	print "mp", mp
 
-	Tmix = Tmix(rockPar)
-	print "Tmix med alla parametrar", Tmix
+	TmixT = Tmix(rockPar)
+	print "Tmix med alla parametrar", TmixT
+
+	BFRpar = {"mw1":2449398.798,"md1":85728.9579, "mr1":153638.54, "Isp1SL":321, "Isp1V":363, "T1":40061523.37, "T2":10430178,"mw2":816466.266, "md2":117000,
+			"mr2":1527, "Isp2V":377,"mp":128367,"alt":26,"incl":26,"lat":26}
+
+	deltaVBFR=deltaV(BFRpar)
+	print "deltaVBFR",deltaVBFR
+	TmixBFR = Tmix(BFRpar)
+	print "Tmix BFR", TmixBFR
+	BFRmp = mpSolver(BFRpar)
+	print "BFRmp",BFRmp
