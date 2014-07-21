@@ -73,7 +73,7 @@ class RocketCapabilityHandler(tornado.web.RequestHandler):
     def post(self):
         indata = json.loads(self.request.body)
         response = {}
-        response["mp"] = mainschilling.mpSolver(indata)
+        response["mp"], response['Approximations'] = mainschilling.mpSolver(indata)
         self.write(json.dumps(response))
 
 application = tornado.web.Application([

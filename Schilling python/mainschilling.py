@@ -85,13 +85,15 @@ def Tmix(rockPar):
 
 	# requires lots of parameters for the rocket and the orbit. returns a maximum payload for said rocket and orbit.
 def mpSolver(mpsolvePar):
+	approximations = {}
 	if ("ssT" not in mpsolvePar):
 		mpsolvePar["sst"] = 0
+		approximations["stage separation time"] = rockPar["ssT"]
 	
 	mp = mpsolver.mpSolve(mpsolvePar["mw1"], mpsolvePar["md1"], mpsolvePar["mr1"], mpsolvePar["Isp1SL"], 
 		mpsolvePar["Isp1V"], mpsolvePar["T1"], mpsolvePar["mw2"], mpsolvePar["md2"], mpsolvePar["mr2"], 
 		mpsolvePar["Isp2V"], mpsolvePar["T2"], mpsolvePar["alt"], mpsolvePar["lat"], mpsolvePar["incl"], mpsolvePar["ssT"])
-	return mp
+	return mp, approximations
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ $.post("/test", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('test/ dVtot', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -55,8 +55,9 @@ var jsonObj = JSON.stringify(myNumbers);
 $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log('deltaV/ dVtot', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('deltaV/ dVtot', result.dVtot); 
+	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -78,7 +79,7 @@ $.post("/Tmix", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('Tmix/ Tmix', result.Tmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -123,7 +124,7 @@ $.post("/rocketCapability", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('rocketCapability/ mp', result.mp); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -147,6 +148,7 @@ $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('deltaV using rocket data to calulate Tmix', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('approximations', result.Approximations);
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -164,7 +166,9 @@ var jsonObj = JSON.stringify(myNumbers);
 $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log('deltaV using standard values to process Tmix', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('deltaV using standard values to process Tmix', result.dVtot); 
+	console.log('approximations', result.Approximations);
+	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
