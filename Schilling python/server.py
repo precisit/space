@@ -37,7 +37,7 @@ class TestHandler(tornado.web.RequestHandler):
         #response["mp"] = mainschilling.mpSolver(indata)
         #print(response)
         response = {}
-        response['dVtot'] = mainschilling.deltaV(indata)
+        response['dVtot'], response['Approximations'] = mainschilling.deltaV(indata)
         self.write(json.dumps(response))
 
 # for further testing of the REST-APIs
@@ -53,7 +53,7 @@ class DeltaVHandler(tornado.web.RequestHandler):
         indata = json.loads(self.request.body)
         #indata.firstStage.wetMass #From meeting
         response = {}
-        response['dVtot'] = mainschilling.deltaV(indata)
+        response['dVtot'], response['Approximations'] = mainschilling.deltaV(indata)
         self.write(json.dumps(response))
 
 class TmixHandler(tornado.web.RequestHandler):
@@ -63,7 +63,7 @@ class TmixHandler(tornado.web.RequestHandler):
     def post(self):
         indata = json.loads(self.request.body)
         response = {}
-        response["Tmix"] = mainschilling.Tmix(indata)
+        response["Tmix"], response['Approximations'] = mainschilling.Tmix(indata)
         self.write(json.dumps(response))
 
 class RocketCapabilityHandler(tornado.web.RequestHandler):
