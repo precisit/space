@@ -7,6 +7,7 @@ import scipy.constants as consts
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.integrate import odeint
 import atmofunc
+import navigation as navi
 
 """
 This is supposed to be an extension of simpleODE, with more forces and function added
@@ -26,6 +27,11 @@ altData = []
 deltaVforce = 0.0
 deltaVgravloss = 0.0
 deltaVdragloss = 0.0
+
+tAltReach = False
+vCircReach = False
+cutFuel = False
+tAlt = 200000
 
 # flag for current stage
 stage = 1
@@ -58,6 +64,7 @@ def rocketfunc(t,w):
 	"""
 	global stage
 	global deltaVforce, deltaVgravloss, deltaVdragloss
+	global tAltReach, vCircReach, cutFuel, tAlt
 	if (stage == 1):
 		Mwet = Mwet1 + Mwet2 + Mp
 		Mfuel = Mfuel1
@@ -81,25 +88,39 @@ def rocketfunc(t,w):
 	Mburnt = mdot*t									# burnt fuel fuel mass at time t [kg]
  	Mcurr = Mwet-Mburnt	 							# Current mass
  	# If no fuel left, cut mdot
+ 	gAlt = 14680
+ 	
+ 	if alt >= gAlt and not tAltReach:
+ 		tAltReach = navi.nav(positions, velocities, tAlt)
+ 	elif tAltReach:
+ 		#print t
+ 		mdot = 0
+ 	
 	if Mburnt >= Mfuel:
 		if (stage ==1):
 			stage = 2
 		else:
 			mdot = 0
 			Mcurr = Mwet-Mfuel
-
+	
+	if alt >= tAlt:
+		tangentV = navi.findHorizVect(positions, velocities)
+		Vunit = tangentV
+		print tangentV
+		if norm(velocities) >= orbitalVelocity(tAlt):
+			mdot = 0
+			#print 'orbit', norm(velocities)
+	
 	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
 	grav = gravAcc(positions) 							# Gravitational acceleration
 	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
 	
 	#Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
 	
-	if alt <= 10000:
+	if alt <= gAlt:
 		Thrunit = positions/norm(positions)
 	else:
 		Thrunit = Vunit
-		#dangle_dt = 0
-
 	accelerations = (1/Mcurr)*(-dragF*Vunit + Thr*Thrunit) - grav
 
 	dragForceData.append(dragF)
@@ -121,12 +142,15 @@ def gravAcc(pos):
 	F = pos*consts.G*Me/(norm(pos)**3)
 	return F
 
+def orbitalVelocity(altm):
+	return math.sqrt(consts.G*Me/(Re+altm))
+
 if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 100000;
-	delta_t =10;
+	t_final = 40000;
+	delta_t = 1;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
@@ -215,14 +239,14 @@ if __name__=='__main__':
 	plt.show()
 	"""
 	""" Plotting 2D"""
-
 	print 'DeltaVforce'
 	print deltaVforce
+	""" 
 	print 'DeltaVdragloss'
 	print deltaVdragloss
 	print 'deltaVgravloss'
 	print deltaVgravloss
-
+	"""
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
