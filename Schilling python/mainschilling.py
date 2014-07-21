@@ -14,6 +14,10 @@ import mpsolver
 	# and an inclination ("incl"). If no time for ascent is given it it computes it by using Tmix
 def deltaV(orbPar):
 	approximations = {}
+	if ("incl" not in orbPar):
+		orbPar["incl"] = orbPar["lat"]
+		approximations["inclination"] = orbPar["incl"]
+		
 	if ("Tmix" in orbPar):
 		dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
 		dVtot = dVobj.deltaVtot()
