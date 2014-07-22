@@ -7,7 +7,7 @@ Isp2V - Specific impulse in vacuum for stage 2 [s].
 ssT - Stage separation time [s].
 """
 
-# Calculates the total ascention time
+# Calculates the total ascention time, by burn time calculations
 def Ta(m1b, Isp1, T1, m2b, Isp2, T2, ssT): 
 	t1 = m1b*Isp1*consts.g/T1
 	t2 = m2b*Isp2*consts.g/T2

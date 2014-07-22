@@ -18,14 +18,12 @@ def deltaV(orbPar):
 		orbPar["incl"] = orbPar["lat"]
 		approximations["inclination"] = orbPar["incl"]
 		
-	if ("Tmix" in orbPar):
-		dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
-		dVtot = dVobj.deltaVtot()
-	else:
-		T, approximations = Tmix(orbPar)
-		dVobj = schilling.DeltaVtot(T, orbPar["alt"], orbPar["lat"], orbPar["incl"])
-		dVtot = dVobj.deltaVtot()
+	if ("Tmix" not in orbPar):
+		orbPar["Tmix"], Tapprox = Tmix(orbPar)
+		approximations.update(Tapprox)
 	
+	dVobj = schilling.DeltaVtot(orbPar["Tmix"], orbPar["alt"], orbPar["lat"], orbPar["incl"])
+	dVtot = dVobj.deltaVtot()
 	return dVtot, approximations
 
 	# Requires lots of parameters for the rocket. Also does the calculations for the mass of the fuel and approximates
@@ -34,14 +32,23 @@ def deltaV(orbPar):
 def Tmix(rockPar):
 	gotMb = True
 	approximations = {}
-	if ("mb1" not in rockPar and "mb2" not in rockPar):
+	
+	if ("mb1" not in rockPar):
 		if("mw1" not in rockPar or "md1" not in rockPar or "mr1" not in rockPar):
 			gotMb = False
 			print "noMb"
 		else:
 			rockPar["mb1"] = rockPar["mw1"]-rockPar["md1"]-rockPar["mr1"]
+			print "mb calculated by mw osv....", rockPar["mb1"]
+
+	if ("mb2" not in rockPar):
+		if("mw2" not in rockPar or "md2" not in rockPar or "mr2" not in rockPar):
+			gotMb = False
+			print "noMb"
+		else:
 			rockPar["mb2"] = rockPar["mw2"]-rockPar["md2"]-rockPar["mr2"]
-			print "mb calculated by mw osv....", rockPar["mb1"],rockPar["mb2"]
+			print "mb calculated by mw osv....", rockPar["mb2"]
+
 	
 	if ("mw1" not in rockPar or "mw2" not in rockPar or "mp" not in rockPar):
 		rockPar["A0"] = 11.8
@@ -75,7 +82,6 @@ def Tmix(rockPar):
 		approximations["Isp for stage 1 in vaacum"] = rockPar["Isp1V"]
 
 	if (gotMb):
-		
 		Tmix = ascTime.Tmix(rockPar["mb1"], rockPar["Isp1SL"], rockPar["T1"], rockPar["mb2"], rockPar["Isp2V"], 
 						rockPar["T2"], rockPar["deltaVp"], rockPar["Isp1V"], rockPar["A0"], rockPar["ssT"])
 		approximations["Ascent time Tmix calculated to"] = Tmix
@@ -102,7 +108,14 @@ def mpSolver(mpsolvePar):
 
 if __name__ == "__main__":
 
-	orbPar = {"Tmix":553.83,"alt":200000,"lat":28,"incl":28}
+	orbitPar = {"Tmix":553.83,"alt":200000,"lat":28,"incl":28}
+
+	orbitPar2 = orbitPar.copy()
+	del orbitPar2['Tmix']
+	
+	orbitPar3 = orbitPar2.copy()
+	del orbitPar3["incl"]
+
 	rockPar = {"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885e3, "mw2":90720, "md2":3200,"mr2":182, "m2res":182, 
 					"Isp2V": 345, "T2":800e3, "alt":200000, "lat": 28, "incl":28, "ssT": 0, "mp":17698}
 	mpsolvePar = {"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885e3, "mw2":90720, "md2":3200,"mr2":182, "m2res":182, 
@@ -110,13 +123,17 @@ if __name__ == "__main__":
 	dVwoTmixpar = mpsolvePar
 	dVwoTmixpar["mp"] = 17698
 
-	deltaV1 = deltaV(orbPar)
+	deltaV1 = deltaV(orbitPar)
 	print "deltaV1 med Tmix", deltaV1
 	print ""
 
-	del orbPar['Tmix']
-	deltaV2 = deltaV(orbPar)
+	deltaV2 = deltaV(orbitPar2)
 	print "deltaV2 utan Tmix, bara alt, lat, incl", deltaV2
+	print ""
+
+
+	deltaV4 = deltaV(orbitPar3)
+	print "deltaV2 utan Tmix, bara alt, lat", deltaV4
 	print ""
 
 	deltaV3 = deltaV(rockPar)
