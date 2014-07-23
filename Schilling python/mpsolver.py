@@ -55,7 +55,7 @@ class mpClass:
 
 # The solving function which takes the orbit- and rocket parameters and returns the maximum payload. This is solved 
 # by using the brentq-method from the scipy-library. The solution for maximum payload mass is assumed to be in the 
-# interval [0, mwtot], where mwtot is the totala wet mass of the stage-1 and stage-2 rockets
+# interval [0, mwtot], where mwtot is the total wet mass of the stage-1 and stage-2 rockets
 def mpSolve(mw1, md1, mr1, Isp1SL, Isp1V, T1, 
 			mw2, md2, mr2, Isp2V, T2, alt, lat, incl, ssT):
 	mpObj = mpClass(mw1, md1, mr1, Isp1SL, Isp1V, T1, 
