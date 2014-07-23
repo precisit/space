@@ -18,47 +18,104 @@ Me = 5.97219e24 								# Earth mass [kg]
 Re = 6371000									# Earth radius [m]
 We = np.array([0,0,2*math.pi/(24*60*60)])		# Earth rotational velocity vector
 
-def projectileDrag(t,w):
+# vector for saving data
+dragForceData = []
+ThrData = []
+timeData = []
+altData = []
+deltaVforce = 0.0
+deltaVgravloss = 0.0
+deltaVdragloss = 0.0
+
+# flag for current stage
+stage = 1
+
+# Rocket parameters
+Mwet1 = 402000							# Total rocket mass (wet mass) [kg]
+Mfuel1 = Mwet1-16000-3900				# Fuel mass	[kg]
+IspVAC1 = 320
+IspSL1 = 282							# Specific impulse in vaacum [s]
+ThrSL1 = 5885e3							# Thrust at sealevel [N]
+mdot1 = ThrSL1/(IspSL1*consts.g)		# Fuel burn rate [kg/s]
+Ae1 = atmofunc.Ae(IspVAC1,mdot1,ThrSL1) # Area of exit nozzle
+
+Mwet2 = 90720
+Mfuel2 = Mwet2-3200-182
+IspVAC2 = 345
+ThrVAC2 = 800000
+mdot2 = ThrVAC2/(IspVAC2*consts.g)
+Ae2 = Ae1
+
+Mp = 10000
+
+
+def rocketfunc(t,w):
 	"""
 	Function for modelling a projectile motion with thrust, variable mass and drag.
 
 	When this program gets RESTified, we probably should send the parameters below as 
 	input arguments.
 	"""
-	
-	# Rocket parameters
-	Mwet = 500000				# Total rocket mass (wet mass) [kg]
-	Mfuel = 470000				# Fuel mass	[kg]
-	Isp = 500					# Specific impulse
-	ThrSL = 5885e3				# Thrust [N]
-	mdot = ThrSL/(Isp*consts.g)		# Fuel burn rate [kg/s]
-	angle = (-0.25*t+90)*math.pi/180 	# Thrust angle - temporary
-	Ae = atmofunc.Ae(Isp,mdot,ThrSL)
-	"""
-	mdot = 100				# Fuel burn rate [kg/s]
-	Vex = 5500  			# Exhaus velocity of burnt fuel [m/s]
-	"""
-	#End params
+	global stage
+	global deltaVforce, deltaVgravloss, deltaVdragloss
+	if (stage == 1):
+		Mwet = Mwet1 + Mwet2 + Mp
+		Mfuel = Mfuel1
+		IspVAC = IspVAC1
+		mdot = mdot1
+		Ae = Ae1
 
-	positions = np.array([w[0], w[2], w[4]]) 				# Positions
+	else:
+		Mwet = Mwet2 + Mp
+		Mfuel = Mfuel2
+		IspVAC = IspVAC2
+		mdot = mdot2
+		Ae = Ae2
+
+	#angle = (0.001*t**2+0.0*t+90)*math.pi/180 	# Thrust angle - temporary
+	positions = np.array([w[0], w[2], w[4]]) 	# Positions
 	velocities = np.array([w[1], w[3], w[5]]) 	# Velocities
-
-	Vunit = velocities/norm(velocities) 									# Unit velocity vector
-
-	Mburnt = mdot*t							# burnt fuel fuel mass at time t [kg]
- 	Mcurr = Mwet-Mburnt	 					# Current mass
+	alt = norm(positions)-Re
+	Vunit = velocities/norm(velocities) 			# Unit velocity vector
+	Posunit = positions/norm(positions)				# Unit position vector 
+	Mburnt = mdot*t									# burnt fuel fuel mass at time t [kg]
+ 	Mcurr = Mwet-Mburnt	 							# Current mass
  	# If no fuel left, cut mdot
 	if Mburnt >= Mfuel:
-		mdot = 0
-		Mcurr = Mwet-Mfuel
+		if (stage ==1):
+			stage = 2
+		else:
+			mdot = 0
+			Mcurr = Mwet-Mfuel
 
-	dragF = atmofunc.dragForce(velocities, positions)# Magnitude of the drag force
-	grav = gravAcc(positions) 						# Gravitational acceleration
-	Thr = atmofunc.thrustEff(Isp,Ae,positions,mdot)
+	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
+	grav = gravAcc(positions) 							# Gravitational acceleration
+	Thr = atmofunc.thrustEff(IspVAC,Ae,positions,mdot)
+	
+	#Thrunit = np.array([math.cos(angle),math.sin(angle),0*Vunit[2]])
 
-	return [velocities[0], (1/Mcurr)*(-dragF*Vunit[0]+Thr*math.cos(angle))-grav[0],
-			velocities[1], (1/Mcurr)*(-dragF*Vunit[1]+Thr*math.sin(angle))-grav[1],
-			velocities[2], (1/Mcurr)*(-dragF*Vunit[2]+0*Thr*Vunit[2])-grav[2]]
+	dragunit = atmofunc.inertToSurf(Vunit,Posunit)
+	if alt <= 14740:
+		Thrunit = Posunit
+	else:
+		Thrunit = Vunit
+		#dangle_dt = 0
+
+	accelerations = (1/Mcurr)*(-dragF*Vunit + Thr*Thrunit) - grav
+
+	dragForceData.append(dragF)
+	ThrData.append(Thr)
+	timeData.append(t)
+	altData.append(alt)
+	deltaVforce += (Thr/Mcurr)*(timeData[len(timeData)-1]-timeData[len(timeData)-2])
+	deltaVgravloss += norm(grav)*(timeData[len(timeData)-1]-timeData[len(timeData)-2])
+	deltaVdragloss += (dragF/Mcurr)*(timeData[len(timeData)-1]-timeData[len(timeData)-2])
+	return [velocities[0], accelerations[0],
+			velocities[1], accelerations[1],
+			velocities[2], accelerations[2]]
+
+
+
 
 def gravAcc(pos):
 	""" Used to calculate the gravity, varying with position """
@@ -69,20 +126,21 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 1000;
-	delta_t =10;
+	t_final = 2000;
+	delta_t =0.1;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
 
 	#Initial launch params
-	latDeg = 0					# Launch latitude in degrees
+	latDeg = 0 					# Launch latitude in degrees
 	longDeg = 90 					# Longitude
 	lat = latDeg*math.pi/180		# Degrees to radians
 	longi = longDeg*math.pi/180		# Radians
 
 	initR = Re*np.array([math.cos(longi)*math.cos(lat), 
 			math.sin(longi)*math.cos(lat),
+
 	 		math.sin(lat)]) 		# Initial position vector
 	initV = np.cross(We, initR)		# Initial velocity contribution due to earth rotation
 
@@ -94,7 +152,7 @@ if __name__=='__main__':
  	# sol2 = sol2.T
 
  	"""Solve with VODE"""
-  	r = integrate.ode(projectileDrag).set_integrator('vode', method='bdf')
+  	r = integrate.ode(rocketfunc).set_integrator('vode', method='bdf')
   	r.set_initial_value(initial_conds, t_start)
   	t = np.zeros((numsteps,1))
 
@@ -121,22 +179,21 @@ if __name__=='__main__':
 
 	 	rz[i] 	= r.y[4]
 	 	velz[i] = r.y[5]
-	 	
-	 	
+
 	 	if norm([rx[i], ry[i], rz[i]])-Re < 0:
 	 		break
 	 	
 	 	i+=1
 
-
 	velocity = np.zeros((numsteps,1))
+	altitude = np.zeros((numsteps,1))
 	for i in range(len(t)):
 		velocity[i] = sqrt(velx[i]**2+vely[i]**2+velz[i]**2)
+		altitude[i] = sqrt(rx[i]**2+ry[i]**2+rz[i]**2)-Re
 	"""End integration """
 
-
-
 	"""Plotting 3D"""
+	
 	fig = plt.figure()
 	ax = Axes3D(fig)
 	ax.scatter(rx,ry,rz, marker='.')
@@ -152,14 +209,21 @@ if __name__=='__main__':
 	ax.set_xlabel('X-axis')
 	ax.set_ylabel('Y-axis')
 	ax.set_zlabel('Z-axis')
-
+	"""
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
+	ax2.plot(t, velocity, t, altitude)
 	plt.show()
-	
-
-	""" Plotting 2D"""
 	"""
+	""" Plotting 2D"""
+
+	print 'DeltaVforce'
+	print deltaVforce
+	print 'DeltaVdragloss'
+	print deltaVdragloss
+	print 'deltaVgravloss'
+	print deltaVgravloss
+
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
@@ -168,8 +232,46 @@ if __name__=='__main__':
 	fig2 = plt.figure()
 	ax2 = fig2.add_subplot(1,1,1)
 	ax2.plot(t, velocity)
+	ax2.set_xlabel('X-axis')
+	ax2.set_ylabel('Y-axis')
 	plt.show()
-	"""
+
+	plt.plot(timeData,altData)
+	plt.title('alt vs time')
+	plt.show()
+	plt.plot(timeData,dragForceData)
+	plt.title('dragForce vs time')
+	plt.show()
+	plt.plot(timeData,ThrData)
+	plt.title('Thr vs time')
+	plt.show()
+	plt.plot(altData,ThrData)
+	plt.title('thrust vs alt')
+	plt.show()
+
+	from matplotlib import animation
+	fig = plt.figure()
+	ax = plt.axes(xlim=(-(Re +300000), Re + 100000), ylim=(-Re - 100000, Re+100000))
+	line, = ax.plot([], [],'ro')
+
+	# initialization function: plot the background of each frame
+	def init():
+	    line.set_data([], [])
+	    return line,
+
+	# animation function.  This is called sequentially
+
+	
+	def animate(i):
+	    
+	    line.set_data(rx[i], ry[i])
+	    return line,
+
+	# call the animator.  blit=True means only re-draw the parts that have changed.
+	anim = animation.FuncAnimation(fig, animate, init_func=init,
+	            interval=10, blit=True)
+
+	plt.show()
 
 
 
