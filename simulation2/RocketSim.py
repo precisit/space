@@ -24,12 +24,17 @@ def RocketFunc(w, t, rocket):
 
 	thrust = atmofunc.thrustEff(rocket.isp, rocket.Ae1, pos, rocket.mdot)
 
+
+	dm = rocket.mcurr-w[6] 						# Mass of the rocket
+	dv = thrust/rocket.mcurr
+
+
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
 	acc = (1/rocket.mcurr)*(-dragForce*velUnit + thrust*initPos/np.linalg.norm(initPos))+GravityAcc
 
 	return [vel[0], acc[0],
 			vel[1], acc[1],
-			vel[2], acc[2]]
+			vel[2], acc[2], dm, dv]
 
 def GravAcc(pos):
 	""" Calculates the gravitational acceleration at the current position """
@@ -47,8 +52,9 @@ if __name__ == '__main__':
 						   math.sin(lat)])					# Initial position vector
 	initVel = np.cross(We, initPos)							# Initial velocity vector
 	print initPos
-	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2]]
-	time = np.linspace(0,100,100) 	
+	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
+					 402000+16000+3900+3200+182+90720, 0]
+	time = np.linspace(0,1000,10000) 	
 	"""
 	Rocket initial conditions
 	"""
@@ -60,29 +66,28 @@ if __name__ == '__main__':
 
 	solutions = odeint(RocketFunc, initial_conds, time, args=(R,))		# Integrate
 
-	X = solutions[:,0]
-	Y = solutions[:,2]
-	Z = solutions[:,4]
+	pos = np.array([solutions[:,0], solutions[:,2], solutions[:,4]])
+	vel = np.array([solutions[:,1], solutions[:,3], solutions[:,5]])
 
-	Vx = solutions[:,1]
-	Vy = solutions[:,3]
-	Vz = solutions[:,5]
+	mass = solutions[:,6]
+	deltaV = solutions[:,7]
 
-	alt = np.zeros((len(solutions),1))
-	vel = np.zeros((len(solutions),1))
+	altitudes = np.zeros((len(solutions),1))
+	speed = np.zeros((len(solutions),1))
+	
 	for i in range(len(solutions)-1):
-		alt[i] = np.linalg.norm([X[i],Y[i],Z[i]])
-		vel[i] = np.linalg.norm([Vx[i], Vy[i], Vz[i]])
-
-	print vel
-
+		altitudes[i] = np.linalg.norm(pos)
+		speed[i] = np.linalg.norm(vel[:,i])
+	
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
 	ax.add_patch(circ)
-	plt.plot(X,Y)
-	plt.ylim([-9000000,9000000])
-	plt.xlim([-9000000,9000000])
+	
+	plt.scatter(pos[0], pos[1], marker='.')
+	print max(deltaV)
+	#plt.ylim([-9000000,9000000])
+	#plt.xlim([-9000000,9000000])
 
 	#plt.plot(time,alt)
 	plt.show()
