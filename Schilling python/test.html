@@ -5,42 +5,6 @@
 Se "Developer Console" för resultat.
 <script>
 
-/*
-var myNumbers = {
-	"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885e3, "mw2":90720, "md2":3200,"mr2":182, "m2res":182, 
-	"Isp2V": 345, "T2":800e3, "alt":200000, "lat": 28, "incl":28, "ssT": 0
-}
-
-document.write("HI MOM!");
-
-*/
-
-var myNumbers = {
-	Tmix: 443, //optional
-	Ta: 500, //optional
-	Isp: 320, //optional
-	alt: 200000,
-	lat: 28,
-	incl: 28
-}
-
-var jsonObj = JSON.stringify(myNumbers);
-
-//$.post("/test", jsonObj, function( result ) {
-$.post("/test", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('test/ dVtot', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
-
-
-
-
-
-
-
-
 
 var myNumbers = {
 	Tmix: 570,
@@ -55,8 +19,9 @@ var jsonObj = JSON.stringify(myNumbers);
 $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log('deltaV/ dVtot', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('deltaV/ dVtot', result.dVtot); 
+	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -78,7 +43,7 @@ $.post("/Tmix", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('Tmix/ Tmix', result.Tmix); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -123,7 +88,7 @@ $.post("/rocketCapability", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('rocketCapability/ mp', result.mp); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
+	console.log('approximations', result.Approximations);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
@@ -147,6 +112,7 @@ $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('deltaV using rocket data to calulate Tmix', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('approximations', result.Approximations);
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -164,7 +130,9 @@ var jsonObj = JSON.stringify(myNumbers);
 $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
-	console.log('deltaV using standard values to process Tmix', result.dVtot); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('deltaV using standard values to process Tmix', result.dVtot); 
+	console.log('approximations', result.Approximations);
+	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
 
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
@@ -172,6 +140,30 @@ $.post("/deltaV", jsonObj, function( result ) {
 
 //mw1:402000,md1:16000, mr1:3900, Isp1SL:282, Isp1V:320, T1: 5885e3, mw2:90720, md2:3200,mr2:182, m2res:182, 
 //	Isp2V: 345, T2:800e3, alt:200000, lat: 28, incl:28, ssT: 0
+
+
+
+
+
+var myNumbers = {
+	 alt:200000
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/deltaV", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('deltaV with not enough input', result.deltaV); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('approximations', result.Approximations);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+
+
+
+
 
 </script>
 </body>

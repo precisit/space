@@ -3,12 +3,10 @@ import ascTime
 import mainschilling
 from scipy import constants as consts
 
-M = 5.97219e24		# Mass of the Eart [kg]
-rj = 6371000		# Radius of the Earth [m]
-
 class DeltaVtot:
 	
-	
+	M = 5.97219e24		# Mass of the Eart [kg]
+	rj = 6371000		# Radius of the Earth [m]
 
 	def __init__(self, Tmix, alt = 200000, lat = 28, incl = 28):
 		self.alt = alt 		# Altitude for the parking orbit
@@ -23,7 +21,7 @@ class DeltaVtot:
 	# Velocity contribution due to earth rotation
 	def Vrot(self):
 		omega = 2*math.pi/(24*60*60)
-		Vrot = omega*rj*math.cos(self.lat*math.pi/180)*math.cos((self.incl-self.lat)*math.pi/180) #cos*cos? # Cos of angle diff.?
+		Vrot = omega*DeltaVtot.rj*math.cos(self.lat*math.pi/180)*math.cos((self.incl-self.lat)*math.pi/180) #cos*cos? # Cos of angle diff.?
 		return Vrot
 
 	# Velocity penalty according to eq.2 in Schilling
@@ -40,7 +38,7 @@ class DeltaVtot:
 	
 #Tangential velocity at altitude alt
 def Vcirc(alt):
-	Vcirc = math.sqrt(M*consts.G/(alt+rj)) 
+	Vcirc = math.sqrt(DeltaVtot.M*consts.G/(alt+DeltaVtot.rj)) 
 	return Vcirc
 
 	#test
