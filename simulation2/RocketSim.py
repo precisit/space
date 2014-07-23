@@ -19,18 +19,17 @@ def RocketFunc(w, t, rocket):
 	vel = np.array([w[1], w[3], w[5]]) 			# Velocities
 	velUnit = vel/np.linalg.norm(vel)			# Unit velocity vector
 	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
+	thrust = rocket.ThrustGravTurn(pos,vel,t)
 
 	rocket.MainController(t)
 
-	thrust = atmofunc.thrustEff(rocket.isp, rocket.Ae1, pos, rocket.mdot)
-
-
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
-	dv = thrust/rocket.mcurr
+	dv = np.linalg.norm(thrust)/rocket.mcurr
+
 
 
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
-	acc = (1/rocket.mcurr)*(-dragForce*velUnit + thrust*initPos/np.linalg.norm(initPos))+GravityAcc
+	acc = (1/rocket.mcurr)*(-dragForce*velUnit + thrust)+GravityAcc
 
 	return [vel[0], acc[0],
 			vel[1], acc[1],
@@ -54,11 +53,11 @@ if __name__ == '__main__':
 	print initPos
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
 					 402000+16000+3900+3200+182+90720, 0]
-	time = np.linspace(0,1000,10000) 	
+	time = np.linspace(0,50000,10000) 	
 	"""
 	Rocket initial conditions
 	"""
-	R = RocketClass.Rocket(402000, 16000, 3900, 320, 280, 5885e3, 90720, 3200, 182, 345, 800000, 14000,time[0])
+	R = RocketClass.Rocket(402000, 16000, 3900, 320, 280, 5885e3, 90720, 3200, 182, 345, 800000, 14000,time[0], 21000, 1)
 
 	""" End initial conditions """
 
@@ -74,10 +73,15 @@ if __name__ == '__main__':
 
 	altitudes = np.zeros((len(solutions),1))
 	speed = np.zeros((len(solutions),1))
-	
+	tang = np.zeros((3,len(solutions)))
+	beta = np.zeros((len(solutions),1))
+
 	for i in range(len(solutions)-1):
-		altitudes[i] = np.linalg.norm(pos)
+		altitudes[i] = np.linalg.norm(pos[:,i])-Re
 		speed[i] = np.linalg.norm(vel[:,i])
+		tang[:,i] = np.cross(pos[:,i],np.cross(vel[:,i],pos[:,i]))
+		if (not np.linalg.norm(tang)==0):
+			beta[i] = np.arccos(np.dot(vel[:,i],tang[:,i])/(np.linalg.norm(tang[:,i])*np.linalg.norm(vel[:,i])))
 	
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
@@ -90,4 +94,22 @@ if __name__ == '__main__':
 	#plt.xlim([-9000000,9000000])
 
 	#plt.plot(time,alt)
+	plt.show()
+
+	plt.subplot(4,1,1)
+	plt.plot(time,altitudes)
+	plt.ylabel("altitude [m]")
+
+	plt.subplot(4,1,2)
+	plt.plot(time,beta*180/math.pi)
+	plt.ylabel("angle to horizon, beta [deg]")
+
+	plt.subplot(4,1,3)
+	plt.plot(time,speed)
+	plt.ylabel("speed [m/s]")
+	
+	plt.subplot(4,1,4)
+	plt.plot(time,mass)
+	plt.ylabel("mass [kg]")
+	plt.xlabel("time [s]")
 	plt.show()
