@@ -5,6 +5,7 @@ import math
 import matplotlib.pyplot as plt
 import scipy.constants as consts
 import RocketClass
+import OrbitCalculations as OC
 
 # Earth constants
 Me = 5.97219e24
@@ -19,10 +20,16 @@ def RocketFunc(w, t, rocket):
 	vel = np.array([w[1], w[3], w[5]]) 			# Velocities
 	velUnit = vel/np.linalg.norm(vel)			# Unit velocity vector
 	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
+	rocket.MainController(t)
 	thrust = rocket.ThrustGravTurn(pos,vel,t)
 
-	rocket.MainController(t)
-
+	if OC.ApsisCalculation(pos, vel)[0] >= Re+230000:
+		rocket.cutFuel = True
+		print OC.ApsisCalculation(pos, vel)
+		thrust = np.array([0,0,0])
+	
+	
+	#print thrust
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr
 
@@ -87,9 +94,9 @@ if __name__ == '__main__':
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
 	ax.add_patch(circ)
-	"""
+	
 
-	plt.plot(time,vel[0,:])
+	plt.scatter(pos[0], pos[1])
 	print max(deltaV)
 	#plt.ylim([-9000000,9000000])
 	#plt.xlim([-9000000,9000000])

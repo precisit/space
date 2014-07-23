@@ -83,20 +83,20 @@ class Rocket:
 		elif (self.nStartT is None):
 			self.nStartT = t
 			ThrUnit = posUnit
-			print "initiate nudge! time, alt",t,alt
+			#print "initiate nudge! time, alt",t,alt
 		elif (t - self.nStartT < self.nT):
 			ThrUnit = tangUnit
-			print "nudging! time, direction",t,ThrUnit
+			#print "nudging! time, direction",t,ThrUnit
 		else:
 			ThrUnit = vunit
 		escVel = np.sqrt(consts.G*Me/np.linalg.norm(pos))
 		beta = np.arccos(np.dot(v,tangent)/(np.linalg.norm(tangent)*np.linalg.norm(v)))
 		if (np.linalg.norm(v)>escVel and beta<0.05):
 			self.cutFuel = True
-			print "success! maybe... t, alt",t,alt
+			#print "success! maybe... t, alt",t,alt
 		elif (self.cutFuel):
 			ThrUnit=tangUnit
 			self.cutFuel=False
-			print "nudging again!",t,alt
+			#print "nudging again!",t,alt
 
 		return maxThrust*ThrUnit
