@@ -52,7 +52,7 @@ ThrVAC2 = 800000
 mdot2 = ThrVAC2/(IspVAC2*consts.g)
 Ae2 = Ae1
 
-Mp = 10000
+Mp = 15000
 
 
 def rocketfunc(t,w):
@@ -60,17 +60,19 @@ def rocketfunc(t,w):
 	Function for modelling a projectile motion with thrust, variable mass and drag.
 
 	When this program gets RESTified, we probably should send the parameters below as 
-	input arguments.
+	input arguments.0-390
 	"""
 	global stage
 	global deltaVforce, deltaVgravloss, deltaVdragloss
 	global tAltReach, vCircReach, cutFuel, tAlt
+	global M1burntime
 	if (stage == 1):
 		Mwet = Mwet1 + Mwet2 + Mp
 		Mfuel = Mfuel1
 		IspVAC = IspVAC1
 		mdot = mdot1
 		Ae = Ae1
+		Mburnt = mdot*t
 
 	else:
 		Mwet = Mwet2 + Mp
@@ -78,6 +80,7 @@ def rocketfunc(t,w):
 		IspVAC = IspVAC2
 		mdot = mdot2
 		Ae = Ae2
+		Mburnt = mdot*(t-M1burntime)
 
 	#angle = (0.001*t**2+0.0*t+90)*math.pi/180 	# Thrust angle - temporary
 	positions = np.array([w[0], w[2], w[4]]) 	# Positions
@@ -85,31 +88,37 @@ def rocketfunc(t,w):
 	alt = norm(positions)-Re
 	Vunit = velocities/norm(velocities) 			# Unit velocity vector
 
-	Mburnt = mdot*t									# burnt fuel fuel mass at time t [kg]
  	Mcurr = Mwet-Mburnt	 							# Current mass
- 	# If no fuel left, cut mdot
- 	gAlt = 14680
- 	
+ 	#gAlt = 14680
+ 	gAlt = 20000
+ 	"""
  	if alt >= gAlt and not tAltReach:
  		tAltReach = navi.nav(positions, velocities, tAlt)
  	elif tAltReach:
- 		#print t
+ 		print 'REACH'
  		mdot = 0
- 	
-	if Mburnt >= Mfuel:
-		if (stage ==1):
-			stage = 2
-		else:
-			mdot = 0
-			Mcurr = Mwet-Mfuel
+ 		cutFuel = True
 	
 	if alt >= tAlt:
 		tangentV = navi.findHorizVect(positions, velocities)
 		Vunit = tangentV
-		print tangentV
+		if stage == 1:
+			mdot = mdot1
+		else:
+			mdot = mdot2
+
 		if norm(velocities) >= orbitalVelocity(tAlt):
 			mdot = 0
 			#print 'orbit', norm(velocities)
+	"""
+
+	if Mburnt >= Mfuel:
+		if (stage ==1):
+			M1burntime = t
+			stage = 2
+		else:
+			mdot = 0
+			Mcurr = Mwet-Mfuel
 	
 	dragF = atmofunc.dragForce(velocities, positions)	# Magnitude of the drag force
 	grav = gravAcc(positions) 							# Gravitational acceleration
@@ -130,12 +139,10 @@ def rocketfunc(t,w):
 	deltaVforce += (Thr/Mcurr)*(timeData[len(timeData)-1]-timeData[len(timeData)-2])
 	deltaVgravloss += norm(grav)*(timeData[len(timeData)-1]-timeData[len(timeData)-2])
 	deltaVdragloss += (dragF/Mcurr)*(timeData[len(timeData)-1]-timeData[len(timeData)-2])
+
 	return [velocities[0], accelerations[0],
 			velocities[1], accelerations[1],
 			velocities[2], accelerations[2]]
-
-
-
 
 def gravAcc(pos):
 	""" Used to calculate the gravity, varying with position """
@@ -149,22 +156,23 @@ if __name__=='__main__':
 
 	"""Time parameters"""
 	t_start = 0.0
-	t_final = 40000;
+	t_final = 600;
 	delta_t = 1;
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 
  	"""initial params"""
 
 	#Initial launch params
-	latDeg = 0 					# Launch latitude in degrees
-	longDeg = 90 					# Longitude
-	lat = latDeg*math.pi/180		# Degrees to radians
-	longi = longDeg*math.pi/180		# Radians
+	latDeg = 0 						# Launch latitude in degrees
+	longDeg = 0 					# Longitude
+	lat = latDeg*pi/180				# Degrees to radians
+	longi = longDeg*pi/180			# Radians
 
 	initR = Re*np.array([math.cos(longi)*math.cos(lat), 
 			math.sin(longi)*math.cos(lat),
+			math.sin(lat)]) 		# Initial position vector
+	print initR
 
-	 		math.sin(lat)]) 		# Initial position vector
 	initV = np.cross(We, initR)		# Initial velocity contribution due to earth rotation
 
  	initial_conds = [initR[0], initV[0], initR[1], initV[1], initR[2], initV[2]] # Initial condition to solver
