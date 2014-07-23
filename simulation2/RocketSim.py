@@ -78,13 +78,14 @@ if __name__ == '__main__':
 	for i in range(len(solutions)-1):
 		altitudes[i] = np.linalg.norm(pos)
 		speed[i] = np.linalg.norm(vel[:,i])
-	
+	"""
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
 	ax.add_patch(circ)
-	
-	plt.scatter(pos[0], pos[1], marker='.')
+	"""
+
+	plt.plot(time,vel[0,:])
 	print max(deltaV)
 	#plt.ylim([-9000000,9000000])
 	#plt.xlim([-9000000,9000000])
