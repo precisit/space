@@ -23,17 +23,15 @@ def RocketFunc(w, t, rocket):
 	rocket.MainController(t)
 	thrust = rocket.ThrustGravTurn(pos,vel,t)
 
-	if OC.ApsisCalculation(pos, vel)[0] >= Re+230000:
+	if OC.ApsisCalculation(pos, vel)[0] >= Re+200000 and not rocket.reach:
 		rocket.cutFuel = True
-		print OC.ApsisCalculation(pos, vel)
+		rocket.reach = True
+		print OC.ApsisCalculation(pos, vel)-np.array([Re,Re])
 		thrust = np.array([0,0,0])
-	
 	
 	#print thrust
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr
-
-
 
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
 	acc = (1/rocket.mcurr)*(-dragForce*velUnit + thrust)+GravityAcc
@@ -60,7 +58,7 @@ if __name__ == '__main__':
 	print initPos
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
 					 402000+16000+3900+3200+182+90720, 0]
-	time = np.linspace(0,50000,10000) 	
+	time = np.linspace(0,5000,10000) 	
 	"""
 	Rocket initial conditions
 	"""
@@ -95,7 +93,6 @@ if __name__ == '__main__':
 	circ = plt.Circle((0,0), radius=Re, color='b')
 	ax.add_patch(circ)
 	
-
 	plt.scatter(pos[0], pos[1])
 	print max(deltaV)
 	#plt.ylim([-9000000,9000000])
