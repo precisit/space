@@ -81,6 +81,8 @@ def inertToSurfVel(vi,ri):
 def thrustEff(Ispvac,Ae,r,mdot):
 	alt = inertToAlt(r)
 	Teff = Ispvac*constants.g*mdot - Ae*pressure(alt)
+	if (Teff<0):
+		Teff=0
 	return Teff
 
 def Ae(Ispvac,mdotmax,FSL):

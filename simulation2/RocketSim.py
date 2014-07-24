@@ -9,7 +9,7 @@ import OrbitCalculations as OC
 
 # Earth constants
 Me = 5.97219e24
-Re = 6371000
+Re = 6371000.
 We = np.array([0,0,2*math.pi/(24*60*60)])
 """
 Functions
@@ -23,12 +23,13 @@ def RocketFunc(w, t, rocket):
 	rocket.MainController(t)
 	thrust = rocket.ThrustGravTurn(pos,vel,t)
 
+	"""
 	if OC.ApsisCalculation(pos, vel)[0] >= Re+200000 and not rocket.reach:
 		rocket.cutFuel = True
 		rocket.reach = True
 		print OC.ApsisCalculation(pos, vel)-np.array([Re,Re])
 		thrust = np.array([0,0,0])
-	
+	"""
 	#print thrust
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr
@@ -58,11 +59,11 @@ if __name__ == '__main__':
 	print initPos
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
 					 402000+16000+3900+3200+182+90720, 0]
-	time = np.linspace(0,5000,10000) 	
+	time = np.linspace(0,30000,1000) 	
 	"""
 	Rocket initial conditions
 	"""
-	R = RocketClass.Rocket(402000, 16000, 3900, 320, 280, 5885e3, 90720, 3200, 182, 345, 800000, 14000,time[0], 21000, 1)
+	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., 14000., time[0], 25000., 3)
 
 	""" End initial conditions """
 
@@ -80,13 +81,15 @@ if __name__ == '__main__':
 	speed = np.zeros((len(solutions),1))
 	tang = np.zeros((3,len(solutions)))
 	beta = np.zeros((len(solutions),1))
+	apsis = np.zeros((3,len(solutions)))
 
 	for i in range(len(solutions)-1):
 		altitudes[i] = np.linalg.norm(pos[:,i])-Re
 		speed[i] = np.linalg.norm(vel[:,i])
 		tang[:,i] = np.cross(pos[:,i],np.cross(vel[:,i],pos[:,i]))
 		if (not np.linalg.norm(tang)==0):
-			beta[i] = np.arccos(np.dot(vel[:,i],tang[:,i])/(np.linalg.norm(tang[:,i])*np.linalg.norm(vel[:,i])))
+			beta[i] = OC.angleVec(vel[:,i],tang[:,i])
+		apsis[:,i] = OC.ApsisCalculation(pos[:,i],vel[:,i])
 	
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
@@ -112,9 +115,22 @@ if __name__ == '__main__':
 	plt.subplot(4,1,3)
 	plt.plot(time,speed)
 	plt.ylabel("speed [m/s]")
-	
+
 	plt.subplot(4,1,4)
-	plt.plot(time,mass)
+	drymasstot = np.ones((len(solutions),1))*(3300+182+14000)
+	plt.plot(time,mass,time,drymasstot)
 	plt.ylabel("mass [kg]")
 	plt.xlabel("time [s]")
 	plt.show()
+
+	plt.subplot(3,1,1)
+	plt.plot(time,apsis[0]-Re)
+	plt.subplot(3,1,2)
+	plt.plot(time,apsis[1]-Re)
+	plt.subplot(3,1,3)
+	plt.plot(time,apsis[2]-Re)
+	plt.show()
+	print OC.ApsisCalculation(np.array([0,Re+200000.,0]),np.array([7788,0,0]))
+	print np.linalg.norm(np.array([0, Re+200000.,0]))
+	print Re
+	print np.array([0,Re+200000.,0])
