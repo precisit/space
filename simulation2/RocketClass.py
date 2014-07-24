@@ -13,6 +13,7 @@ class Rocket:
 		self.stage1 = True
 		self.stage2 = True
 		self.cutFuel = False
+		self.reach = False
 
 		self.mw1 = mw1
 		self.md1 = md1
@@ -55,7 +56,7 @@ class Rocket:
 				
 
 	def MainController(self, t):
-		if self.cutFuel:
+		if self.cutFuel or self.reach:
 			self.mdot = 0
 		else:
 			if self.mfuelCurrent > self.mfuel2:
