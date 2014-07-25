@@ -14,7 +14,6 @@ class Rocket:
 		self.stage1 = True
 		self.stage2 = True
 		self.cutFuel = False
-		self.reach = False
 
 		self.mw1 = mw1
 		self.md1 = md1
@@ -57,7 +56,7 @@ class Rocket:
 				
 
 	def MainController(self, t):
-		if self.cutFuel or self.reach:
+		if self.cutFuel:
 			self.mdot = 0
 		else:
 			if self.mfuelCurrent > self.mfuel2:
@@ -81,14 +80,10 @@ class Rocket:
 		tangUnit = tangent/np.linalg.norm(tangent)
 		apsis = OC.ApsisCalculation(pos,v)
 
-		if apsis[2]> Re+185e3 and apsis[1]>Re+185e3 and apsis[0]>Re+185e3:
-			print self.mdot
-			print self.cutFuel
-			print self.mfuelCurrent
+		if apsis[1]>Re+185e3 :
 			self.cutFuel=True
 			self.mdot = 0
 			ThrUnit=posUnit
-			print "!!!!!!"
 		else:
 			if (alt < self.nAlt):
 				ThrUnit = posUnit
