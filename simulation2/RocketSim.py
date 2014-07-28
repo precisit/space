@@ -22,7 +22,7 @@ def RocketFunc(w, t, rocket):
 	velUnit = vel/np.linalg.norm(vel)			# Unit velocity vector
 	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
 	rocket.MainController(t)
-	thrust = rocket.newThrustGravTurn(pos,vel,t)
+	thrust = rocket.newThrustGravTurn(pos,vel,t,w[8])
 
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr
@@ -53,11 +53,11 @@ if __name__ == '__main__':
 	payload = 14000.
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
 					 402000+90720+payload, 0, 5885.e3]
-	time = np.linspace(0,8000,10000) 	
+	time = np.linspace(0,8000,1000) 	
 	"""
 	Rocket initial conditions
 	"""
-	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, time[0], 25000., 0.615384615)
+	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, time[0], 25000., 0.615384615,3)
 
 	""" End initial conditions """
 
@@ -143,5 +143,5 @@ if __name__ == '__main__':
 	plt.ylabel("applied deltaV [m/s]")
 	plt.xlabel("time [s]")
 	plt.show()
-	plt.plot(time, thrust/(mass))
+	plt.plot(time, thrust/(mass*consts.g))
 	plt.show()

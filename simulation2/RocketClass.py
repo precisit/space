@@ -9,7 +9,7 @@ Me = 5.97219e24
 class Rocket:
 	def __init__(self,mw1, md1, mi1, isp1v, isp1sl, thr1sl,
 				mw2, md2, mi2, isp2v, thr2v,
-				mp, t, nAlt, nT):
+				mp, t, nAlt, nT, alim):
 		self.t = t
 		self.stage1 = True
 		self.stage2 = True
@@ -39,6 +39,10 @@ class Rocket:
 		self.nT = nT
 		self.nStartT = None
 
+		self.alim = alim*consts.g
+
+		self.mflow = 1
+
 		self.mcurr = mw1+mw2+mp
 		self.Ae1 = atmofunc.Ae(isp1v, self.mdot1, thr1sl)
 		self.Ae2 = self.Ae1
@@ -48,10 +52,10 @@ class Rocket:
 
 	def SetMass(self,t):
 		if self.mfuelCurrent > self.mfuel2:
-			self.mfuelCurrent -= (t-self.t)*self.mdot
+			self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 			self.mcurr = self.mfuelCurrent + self.md1+self.md2+self.mi1+self.mi2+self.mp
 		else:
-			self.mfuelCurrent -= (t-self.t)*self.mdot
+			self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 			self.mcurr = self.mfuelCurrent+self.md2+self.mi2+self.mp
 				
 
@@ -101,7 +105,7 @@ class Rocket:
 		maxThrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot) 
 		
 		return maxThrust*ThrUnit
-	def newThrustGravTurn(self, pos, v, t):
+	def newThrustGravTurn(self, pos, v, t, F):
 
 		alt = np.linalg.norm(pos) - Re
 		posUnit = pos/np.linalg.norm(pos)
@@ -127,6 +131,17 @@ class Rocket:
 		else:
 			ThrUnit = vunit
 
-		maxThrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot) 
 		
-		return maxThrust*ThrUnit
+		self.accLimit(F)
+		Thrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot*self.mflow) 
+		return Thrust*ThrUnit
+
+	def accLimit(self,F):
+		adif = F/self.mcurr - self.alim
+		if (adif < 0):
+			self.mflow = 1
+		else:
+			self.mflow = 1 -adif*self.mcurr/F
+			print "mflow",self.mflow
+
+
