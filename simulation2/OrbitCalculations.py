@@ -35,3 +35,6 @@ def angleVec(v1,v2):
 
 def orthDist(Ra,Rp):
 	return 2*Rp*Ra/(Rp + Ra)
+
+def escVel(pos):
+	return np.sqrt(Me*consts.G/np.linalg.norm(pos))

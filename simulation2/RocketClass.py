@@ -80,7 +80,7 @@ class Rocket:
 		tangUnit = tangent/np.linalg.norm(tangent)
 		apsis = OC.ApsisCalculation(pos,v)
 
-		if apsis[1]>Re+185e3 :
+		if apsis[1]>Re+150e3 :
 			self.cutFuel=True
 			self.mdot = 0
 			ThrUnit=posUnit
@@ -98,6 +98,35 @@ class Rocket:
 				ThrUnit = vunit
 		
 		
+		maxThrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot) 
+		
+		return maxThrust*ThrUnit
+	def newThrustGravTurn(self, pos, v, t):
+
+		alt = np.linalg.norm(pos) - Re
+		posUnit = pos/np.linalg.norm(pos)
+		vunit = v/np.linalg.norm(v)
+		tangent = np.cross(pos,np.cross(v,pos))
+		tangUnit = tangent/np.linalg.norm(tangent)
+		apsis = OC.ApsisCalculation(pos,v)
+		if (alt < self.nAlt):
+				ThrUnit = posUnit
+		elif (self.nStartT is None):
+			self.nStartT = t
+			ThrUnit = posUnit
+			#print "initiate nudge! time, alt",t,alt
+		elif (t - self.nStartT < self.nT):
+			ThrUnit = tangUnit
+			#print "nudging! time, direction",t,ThrUnit
+		elif (OC.angleVec(posUnit,vunit) > np.pi/2 or alt>200000):
+			ThrUnit = tangUnit
+			if OC.escVel(pos) < np.linalg.norm(v) and np.linalg.norm(OC.angleVec(posUnit,vunit)-np.pi/2) < 0.002:
+				self.cutFuel = True
+				self.mdot = 0
+
+		else:
+			ThrUnit = vunit
+
 		maxThrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot) 
 		
 		return maxThrust*ThrUnit

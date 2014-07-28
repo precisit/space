@@ -22,7 +22,7 @@ def RocketFunc(w, t, rocket):
 	velUnit = vel/np.linalg.norm(vel)			# Unit velocity vector
 	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
 	rocket.MainController(t)
-	thrust = rocket.ThrustGravTurn(pos,vel,t)
+	thrust = rocket.newThrustGravTurn(pos,vel,t)
 
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr
@@ -50,13 +50,14 @@ if __name__ == '__main__':
 						   math.cos(lat)*math.sin(longi),
 						   math.sin(lat)])					# Initial position vector
 	initVel = np.cross(We, initPos)							# Initial velocity vector
+	payload = 14000.
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-					 402000+16000+3900+3200+182+90720, 0, 5885.e3]
-	time = np.linspace(0,8000,1000) 	
+					 402000+90720+payload, 0, 5885.e3]
+	time = np.linspace(0,8000,10000) 	
 	"""
 	Rocket initial conditions
 	"""
-	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., 17000., time[0], 20555.55556, 0.55555556)
+	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, time[0], 25000., 0.615384615)
 
 	""" End initial conditions """
 
@@ -117,7 +118,7 @@ if __name__ == '__main__':
 	plt.ylabel("speed [m/s]")
 
 	plt.subplot(4,1,4)
-	drymasstot = np.ones((len(solutions),1))*(3300+182+17000)
+	drymasstot = np.ones((len(solutions),1))*(3300+182+payload)
 	plt.plot(time,mass,time,drymasstot)
 	plt.ylabel("mass [kg]")
 	plt.xlabel("time [s]")
@@ -141,4 +142,6 @@ if __name__ == '__main__':
 	plt.plot(time,deltaV)
 	plt.ylabel("applied deltaV [m/s]")
 	plt.xlabel("time [s]")
+	plt.show()
+	plt.plot(time, thrust/(mass))
 	plt.show()

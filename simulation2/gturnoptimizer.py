@@ -18,11 +18,10 @@ initPos = Re*np.array([math.cos(lat)*math.cos(longi),
 					   math.sin(lat)])					# Initial position vector
 
 initVel = np.cross(We, initPos)							# Initial velocity vector
+mp = 14000.
 initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-				 402000+16000+3900+3200+182+90720, 0, 5885.e3]
+				 402000 + 90720 + mp, 0, 5885.e3]
 time = np.linspace(0,8000,1000) 
-mp = 17000
-
 def simFunc(nudgeAlt,nudgeTime):
 
 	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., mp, time[0], nudgeAlt,nudgeTime)
@@ -30,8 +29,8 @@ def simFunc(nudgeAlt,nudgeTime):
 	return solutions		
 
 if __name__ == '__main__':
-	nAlts = np.linspace(20000.,25000.,10)
-	nTimes = np.linspace(0.,5.,10)
+	nAlts = np.linspace(10000.,25000.,40)
+	nTimes = np.linspace(0.,6.,40)
 	print nAlts
 	print nTimes
 	print len(nTimes)
