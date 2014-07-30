@@ -11,7 +11,7 @@ import ascTime
 # Earth constants
 Me = 5.97219e24
 Re = 6371000.
-We = np.array([0,0,2*math.pi/(24*60*60)])
+We = np.array([0,0,2*np.pi/(24*60*60)])
 """
 Functions
 """
@@ -19,8 +19,8 @@ Functions
 def RocketFunc(w, t, rocket):
 	pos = np.array([w[0], w[2], w[4]])			# Positions
 	vel = np.array([w[1], w[3], w[5]]) 			# Velocities
-	velUnit = vel/np.linalg.norm(vel)			# Unit velocity vector
-	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
+	velUnit = atmofunc.unit(vel)			# Unit velocity vector
+	dragForce = atmofunc.dragForce(vel, pos, t)	# Drag force magnitude
 	rocket.MainController(t)
 	thrust = rocket.newThrustGravTurn(pos,vel,t,w[8])
 
@@ -28,7 +28,12 @@ def RocketFunc(w, t, rocket):
 	dv = np.linalg.norm(thrust)/rocket.mcurr
 	dT = np.linalg.norm(thrust)-w[8]
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
-	acc = (1/rocket.mcurr)*(-dragForce*velUnit + thrust)+GravityAcc
+	surfVel = atmofunc.inertToSurfVel(vel,pos,t)
+	surfVelUnit = atmofunc.unit(surfVel)
+	dragUnit = atmofunc.surfToInertPos(-surfVelUnit,t)
+	
+	
+	acc = (1/rocket.mcurr)*(-dragForce*dragUnit + thrust)+GravityAcc
 
 	return [vel[0], acc[0],
 			vel[1], acc[1],
@@ -50,20 +55,22 @@ if __name__ == '__main__':
 						   math.cos(lat)*math.sin(longi),
 						   math.sin(lat)])					# Initial position vector
 	initVel = np.cross(We, initPos)							# Initial velocity vector
-	payload = 14000.
+	payload = 10000.
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
 					 402000+90720+payload, 0, 5885.e3]
-	time = np.linspace(0,8000,1000) 	
+	timeUncut = np.linspace(0,1000,150000) 	
 	"""
 	Rocket initial conditions
 	"""
-	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, time[0], 25000., 0.615384615,3)
+	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, timeUncut[0], 10000., 25,100)
 
 	""" End initial conditions """
 
 
 
-	solutions = odeint(RocketFunc, initial_conds, time, args=(R,))		# Integrate
+	solutionUncut = odeint(RocketFunc, initial_conds, timeUncut, args=(R,))		# Integrate
+	time = timeUncut[0::100]
+	solutions = solutionUncut[0::100,:] 
 	print "time to execute",timer.time()-startTime
 	pos = np.array([solutions[:,0], solutions[:,2], solutions[:,4]])
 	vel = np.array([solutions[:,1], solutions[:,3], solutions[:,5]])
@@ -76,7 +83,10 @@ if __name__ == '__main__':
 	tang = np.zeros((3,len(solutions)))
 	beta = np.zeros((len(solutions),1))
 	apsis = np.zeros((3,len(solutions)))
-
+	posEarth = np.zeros((3,len(solutions)))
+	surfVel = np.zeros((3,len(solutions)))
+	surfVelUnit = np.zeros((3,len(solutions)))
+	dragUnit = np.zeros((3,len(solutions)))
 	for i in range(len(solutions)):
 		altitudes[i] = np.linalg.norm(pos[:,i])-Re
 		speed[i] = np.linalg.norm(vel[:,i])
@@ -84,6 +94,12 @@ if __name__ == '__main__':
 		if (not np.linalg.norm(tang)==0):
 			beta[i] = OC.angleVec(vel[:,i],tang[:,i])
 		apsis[:,i] = OC.ApsisCalculation(pos[:,i],vel[:,i])
+		posEarth[0,i] = pos[0,i]*np.cos(-We[2]*time[i]) - pos[1,i]*np.sin(-We[2]*time[i])
+		posEarth[1,i] = pos[0,i]*np.sin(-We[2]*time[i]) + pos[1,i]*np.cos(-We[2]*time[i])
+
+		surfVel[:,i] = atmofunc.inertToSurfVel(vel[:,i],pos[:,i],time[i])
+		surfVelUnit[:,i] = atmofunc.unit(surfVel[:,i])
+		dragUnit[:,i] = atmofunc.surfToInertPos(-surfVelUnit[:,i],time[i])
 	
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
@@ -144,4 +160,11 @@ if __name__ == '__main__':
 	plt.xlabel("time [s]")
 	plt.show()
 	plt.plot(time, thrust/(mass*consts.g))
+	plt.show()
+
+	fig = plt.figure()
+	ax = fig.add_subplot(1,1,1)
+	circ = plt.Circle((0,0), radius=Re, color='b')
+	ax.add_patch(circ)
+	plt.quiver(pos[0], pos[1],tang[0],tang[1])
 	plt.show()

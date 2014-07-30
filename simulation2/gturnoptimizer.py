@@ -10,7 +10,7 @@ import time as timer
 import RocketSim
 import warnings
 Re = 6371000.
-We = np.array([0,0,2*math.pi/(24*60*60)])
+We = np.array([0,0,2*np.pi/(24*60*60)])
 lat = math.radians(0) 									# Latitude
 longi = math.radians(90)								# Longitude
 initPos = Re*np.array([math.cos(lat)*math.cos(longi),

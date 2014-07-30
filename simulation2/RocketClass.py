@@ -5,6 +5,7 @@ import scipy.constants as consts
 import OrbitCalculations as OC
 Re = 6371000.
 Me = 5.97219e24
+We = np.array([0,0,2*np.pi/(24*60*60)])
 
 class Rocket:
 	def __init__(self,mw1, md1, mi1, isp1v, isp1sl, thr1sl,
@@ -39,6 +40,8 @@ class Rocket:
 		self.nT = nT
 		self.nStartT = None
 
+		self.firstcall = True
+		self.initThrust = np.zeros(3)
 		self.alim = alim*consts.g
 
 		self.mflow = 1
@@ -79,7 +82,7 @@ class Rocket:
 		
 		alt = np.linalg.norm(pos) - Re
 		posUnit = pos/np.linalg.norm(pos)
-		vunit = v/np.linalg.norm(v)
+		vUnit = v/np.linalg.norm(v)
 		tangent = np.cross(pos,np.cross(v,pos))
 		tangUnit = tangent/np.linalg.norm(tangent)
 		apsis = OC.ApsisCalculation(pos,v)
@@ -91,6 +94,7 @@ class Rocket:
 		else:
 			if (alt < self.nAlt):
 				ThrUnit = posUnit
+				
 			elif (self.nStartT is None):
 				self.nStartT = t
 				ThrUnit = posUnit
@@ -99,7 +103,9 @@ class Rocket:
 				ThrUnit = tangUnit
 				#print "nudging! time, direction",t,ThrUnit
 			else:
-				ThrUnit = vunit
+				ThrUnit = vUnit - Re*np.array([math.cos(lat)*math.cos(longi),
+						   math.cos(lat)*math.sin(longi),
+						   math.sin(lat)])
 		
 		
 		maxThrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot) 
@@ -109,29 +115,40 @@ class Rocket:
 
 		alt = np.linalg.norm(pos) - Re
 		posUnit = pos/np.linalg.norm(pos)
-		vunit = v/np.linalg.norm(v)
+		vUnit = v/np.linalg.norm(v)
+		surfV = atmofunc.inertToSurfVel(v,pos,t)
+		surfVUnit = atmofunc.unit(surfV)
+		gTurnUnit = atmofunc.surfToInertPos(surfVUnit,t)
 		tangent = np.cross(pos,np.cross(v,pos))
-		tangUnit = tangent/np.linalg.norm(tangent)
-		apsis = OC.ApsisCalculation(pos,v)
-		if (alt < self.nAlt):
-				ThrUnit = posUnit
+		tangUnit = atmofunc.unit(tangent)
+		#apsis = OC.ApsisCalculation(pos,v)
+		if self.firstcall:
+			ThrUnit = np.cos(np.radians(4))*posUnit + np.sin(np.radians(4))*vUnit
+			self.firstcall = False
+			self.initThrust = ThrUnit
+		elif (alt < self.nAlt):
+			ThrUnit = self.initThrust
 		elif (self.nStartT is None):
 			self.nStartT = t
-			ThrUnit = posUnit
+			ThrUnit = gTurnUnit
 			#print "initiate nudge! time, alt",t,alt
 		elif (t - self.nStartT < self.nT):
+			ThrUnit = atmofunc.unit(np.cos(np.radians(45))*tangUnit + np.sin(np.radians(45))*gTurnUnit)
+			#print "nudging!", np.linalg.norm(ThrUnit)
+		elif  (alt>200000):
 			ThrUnit = tangUnit
-			#print "nudging! time, direction",t,ThrUnit
-		elif (OC.angleVec(posUnit,vunit) > np.pi/2 or alt>200000):
-			ThrUnit = tangUnit
-			if OC.escVel(pos) < np.linalg.norm(v) and np.linalg.norm(OC.angleVec(posUnit,vunit)-np.pi/2) < 0.002:
+			if OC.escVel(pos) < np.dot(v,tangUnit) :
 				self.cutFuel = True
 				self.mdot = 0
+				print "cutFuel"
 
 		else:
-			ThrUnit = vunit
+			ThrUnit = gTurnUnit
 
-		
+
+
+		#if (np.linalg.norm(np.linalg.norm(ThrUnit)-1)>0.00001:
+		#	print (np.linalg.norm(np.linalg.norm(ThrUnit)-1)
 		self.accLimit(F)
 		Thrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot*self.mflow) 
 		return Thrust*ThrUnit

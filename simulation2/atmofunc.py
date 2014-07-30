@@ -6,7 +6,8 @@ import math
 import scipy.constants as constants
 
 Re = 6371000
-omega = np.array([0,0,math.pi*2./(24*3600)])
+We = np.array([0,0,np.pi*2./(24*3600)])
+
 
 Ptck1 = pickle.load(open('Pressuretck1.pk1'))
 Ptck2 = pickle.load(open('Pressuretck2.pk1'))
@@ -53,8 +54,8 @@ def dragCoefficient(v,alt):
 	return CD
 	
 	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
-def dragForce(vi,ri,A=113):
-	vr, alt = inertToSurf(vi,ri)
+def dragForce(vi,ri,t, A=113):
+	vr, alt = inertToSurf(vi,ri,t)
 	v = np.linalg.norm(vr)
 	CD = dragCoefficient(v,alt)
 	rho = density(alt)
@@ -63,8 +64,8 @@ def dragForce(vi,ri,A=113):
 
 
 
-def inertToSurf(vi,ri):
-	vr = inertToSurfVel(vi,ri)
+def inertToSurf(vi,ri,t):
+	vr = inertToSurfVel(vi,ri,t)
 	alt = inertToAlt(ri)
 	return vr,alt
 
@@ -72,10 +73,33 @@ def inertToAlt(ri):
 	alt = np.linalg.norm(ri)-Re
 	return alt
 
-def inertToSurfVel(vi,ri):
-	vr = vi-np.cross(omega,ri)
+def inertToSurfVel(vi,ri,t):
+	rr = inertToSurfPos(ri,t)
+	vr = vi - np.cross(We,rr)
 	return vr
 
+def inertToSurfPos(ri,t):
+	omega = np.linalg.norm(We)
+	Rot = np.array([[np.cos(-omega*t), -np.sin(-omega*t), 0], 
+					[np.sin(-omega*t), np.cos(-omega*t), 0],
+					[0, 0, 1]])
+	rr = np.dot(ri,Rot)
+	return rr
+
+def surfToInertPos(rr,t):
+	omega = np.linalg.norm(We)
+	Rot = np.array([[np.cos(omega*t), -np.sin(omega*t), 0], 
+					[np.sin(omega*t), np.cos(omega*t), 0],
+					[0, 0, 1]])
+	ri = np.dot(rr,Rot)
+	return ri
+def unit(vec):
+	norm = np.linalg.norm(vec)
+	if norm == 0:
+		unit = np.array([0,0,0])
+	else:
+		unit = vec/norm
+	return unit
 
 	# efficient thrust as a function of position and current massflow. Ae is the area of the nozzle exit.
 def thrustEff(Ispvac,Ae,r,mdot):
