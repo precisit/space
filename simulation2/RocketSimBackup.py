@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import integrate
+from scipy.integrate import odeint
 import atmofunc
 import math
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ We = np.array([0,0,2*np.pi/(24*60*60)])
 Functions
 """
 
-def RocketFunc(t, w, rocket):
+def RocketFunc(w, t, rocket):
 	pos = np.array([w[0], w[2], w[4]])			# Positions
 	vel = np.array([w[1], w[3], w[5]]) 			# Velocities
 	velUnit = atmofunc.unit(vel)			# Unit velocity vector
@@ -30,13 +30,7 @@ def RocketFunc(t, w, rocket):
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
 	surfVel = atmofunc.inertToSurfVel(vel,pos,t)
 	surfVelUnit = atmofunc.unit(surfVel)
-
-	if t <= 1:
-		dragUnit = (vel-np.cross(We,np.array([0,Re,0])))/np.linalg.norm(vel-np.cross(We,np.array([0,Re,0])))			# Unit velocity vector
-	else:
-		dragUnit = (vel-np.cross(We,pos))/np.linalg.norm(vel-np.cross(We,pos))
-
-	#dragUnit = atmofunc.surfToInertPos(-surfVelUnit,t)
+	dragUnit = atmofunc.surfToInertPos(-surfVelUnit,t)
 	
 	
 	acc = (1/rocket.mcurr)*(-dragForce*dragUnit + thrust)+GravityAcc
@@ -61,23 +55,39 @@ if __name__ == '__main__':
 						   math.cos(lat)*math.sin(longi),
 						   math.sin(lat)])					# Initial position vector
 	initVel = np.cross(We, initPos)							# Initial velocity vector
-	payload = 13000.
+	payload = 10000.
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
 					 402000+90720+payload, 0, 5885.e3]
-	t_start = 0.0
-	t_final = 20000
-	delta_t = 1
-	numsteps = np.floor((t_final-t_start)/delta_t)+1 	
-	t = np.zeros((numsteps,1))
-	t[0] = 0
+	timeUncut = np.linspace(0,1000,150000) 	
 	"""
 	Rocket initial conditions
 	"""
-	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, t[0], 10000, 2.5,100)
-	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
-	r.set_initial_value(initial_conds, t_start).set_f_params(R)
-	
+	R = RocketClass.Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., payload, timeUncut[0], 10000., 25,100)
 
+	""" End initial conditions """
+
+
+"""
+	solutionUncut = odeint(RocketFunc, initial_conds, timeUncut, args=(R,))		# Integrate
+	time = timeUncut[0::100]
+	solutions = solutionUncut[0::100,:] 
+	print "time to execute",timer.time()-startTime
+	pos = np.array([solutions[:,0], solutions[:,2], solutions[:,4]])
+	vel = np.array([solutions[:,1], solutions[:,3], solutions[:,5]])
+	mass = solutions[:,6]
+	deltaV = solutions[:,7]
+	thrust = solutions[:,8]
+
+	altitudes = np.zeros((len(solutions),1))
+	speed = np.zeros((len(solutions),1))
+	tang = np.zeros((3,len(solutions)))
+	beta = np.zeros((len(solutions),1))
+	apsis = np.zeros((3,len(solutions)))
+	posEarth = np.zeros((3,len(solutions)))
+	surfVel = np.zeros((3,len(solutions)))
+	surfVelUnit = np.zeros((3,len(solutions)))
+	dragUnit = np.zeros((3,len(solutions)))
+"""
 	pos = np.zeros((3, numsteps))
 	vel = np.zeros((3, numsteps))
 	mass = np.zeros((numsteps,1))
@@ -88,12 +98,12 @@ if __name__ == '__main__':
 	tang = np.zeros((3,numsteps))
 	altitudes = np.zeros((numsteps,1))
 	beta = np.zeros((numsteps,1))
-	posEarth = np.zeros((3,numsteps))
-	surfVel = np.zeros((3,numsteps))
-	surfVelUnit = np.zeros((3,numsteps))
-	dragUnit = np.zeros((3,numsteps))
+	posEarth = np.zeros((3,len(solutions)))
+	surfVel = np.zeros((3,len(solutions)))
+	surfVelUnit = np.zeros((3,len(solutions)))
+	dragUnit = np.zeros((3,len(solutions)))
 	apsis = np.zeros((3,numsteps))
-	i=1
+
 	while r.successful() and i < numsteps:
 		r.integrate(r.t + delta_t)
 		t[i] = r.t
@@ -111,21 +121,35 @@ if __name__ == '__main__':
 		altitudes[i] = np.linalg.norm(pos[:,i])-Re
 		apsis[:,i] = OC.ApsisCalculation(pos[:,i],vel[:,i])
 		beta[i] = OC.angleVec(vel[:,i]-np.cross(We, pos[:,i]),tang[:,i])
-		posEarth[0,i] = pos[0,i]*np.cos(-We[2]*t[i]) - pos[1,i]*np.sin(-We[2]*t[i])
-		posEarth[1,i] = pos[0,i]*np.sin(-We[2]*t[i]) + pos[1,i]*np.cos(-We[2]*t[i])
+		posEarth[0,i] = pos[0,i]*np.cos(-We[2]*time[i]) - pos[1,i]*np.sin(-We[2]*time[i])
+		posEarth[1,i] = pos[0,i]*np.sin(-We[2]*time[i]) + pos[1,i]*np.cos(-We[2]*time[i])
 
-		surfVel[:,i] = atmofunc.inertToSurfVel(vel[:,i],pos[:,i],t[i])
+		surfVel[:,i] = atmofunc.inertToSurfVel(vel[:,i],pos[:,i],time[i])
 		surfVelUnit[:,i] = atmofunc.unit(surfVel[:,i])
-		dragUnit[:,i] = (vel[:,i]-np.cross(We,pos[:,i]))/np.linalg.norm(vel[:,i]-np.cross(We,pos[:,i]))#atmofunc.surfToInertPos(-surfVelUnit[:,i],t[i])
+		dragUnit[:,i] = atmofunc.surfToInertPos(-surfVelUnit[:,i],time[i])
 
 		i+=1
+"""
+	for i in range(len(solutions)):
+		altitudes[i] = np.linalg.norm(pos[:,i])-Re
+		speed[i] = np.linalg.norm(vel[:,i])
+		tang[:,i] = np.cross(pos[:,i],np.cross(vel[:,i],pos[:,i]))
+		if (not np.linalg.norm(tang)==0):
+			beta[i] = OC.angleVec(vel[:,i],tang[:,i])
+		apsis[:,i] = OC.ApsisCalculation(pos[:,i],vel[:,i])
+		posEarth[0,i] = pos[0,i]*np.cos(-We[2]*time[i]) - pos[1,i]*np.sin(-We[2]*time[i])
+		posEarth[1,i] = pos[0,i]*np.sin(-We[2]*time[i]) + pos[1,i]*np.cos(-We[2]*time[i])
 
+		surfVel[:,i] = atmofunc.inertToSurfVel(vel[:,i],pos[:,i],time[i])
+		surfVelUnit[:,i] = atmofunc.unit(surfVel[:,i])
+		dragUnit[:,i] = atmofunc.surfToInertPos(-surfVelUnit[:,i],time[i])
+"""
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
 	ax.add_patch(circ)
 	
-	plt.quiver(pos[0], pos[1], vel[0], vel[1])
+	plt.scatter(pos[0], pos[1])
 	#plt.ylim([-9000000,9000000])
 	#plt.xlim([-9000000,9000000])
 
@@ -141,43 +165,44 @@ if __name__ == '__main__':
 	print "deltaV capability",dVRockeq
 
 	plt.subplot(4,1,1)
-	plt.plot(t,altitudes)
+	plt.plot(time,altitudes)
 	plt.ylabel("altitude [m]")
+
 	plt.subplot(4,1,2)
-	plt.plot(t,beta*180/math.pi)
+	plt.plot(time,beta*180/math.pi)
 	plt.ylabel("angle to horizon, beta [deg]")
 
 	plt.subplot(4,1,3)
-	plt.plot(t,speed)
+	plt.plot(time,speed)
 	plt.ylabel("speed [m/s]")
 
 	plt.subplot(4,1,4)
-	drymasstot = np.ones((numsteps,1))*(3300+182+payload)
-	plt.plot(t,mass,t,drymasstot)
+	drymasstot = np.ones((len(solutions),1))*(3300+182+payload)
+	plt.plot(time,mass,time,drymasstot)
 	plt.ylabel("mass [kg]")
 	plt.xlabel("time [s]")
 	plt.show()
 
 	plt.subplot(3,1,1)
-	plt.plot(t,apsis[0]-Re)
+	plt.plot(time,apsis[0]-Re)
 	plt.ylabel("periapsis-Re [m]")
 	plt.subplot(3,1,2)
-	plt.plot(t,apsis[1]-Re)
+	plt.plot(time,apsis[1]-Re)
 	plt.ylabel("apoapsis-Re [m]")
 	plt.subplot(3,1,3)
-	plt.plot(t,apsis[2]-Re)
+	plt.plot(time,apsis[2]-Re)
 	plt.ylabel("orthdist-Re [m]")
 	plt.show()
 	
 	plt.subplot(2,1,1)
-	plt.plot(t, thrust)
+	plt.plot(time, thrust)
 	plt.ylabel("thrust [N]")
 	plt.subplot(2,1,2)
-	plt.plot(t,deltaV)
+	plt.plot(time,deltaV)
 	plt.ylabel("applied deltaV [m/s]")
 	plt.xlabel("time [s]")
 	plt.show()
-	plt.plot(t, thrust/(mass*consts.g))
+	plt.plot(time, thrust/(mass*consts.g))
 	plt.show()
 
 	fig = plt.figure()

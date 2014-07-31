@@ -140,7 +140,7 @@ class Rocket:
 			if OC.escVel(pos) < np.dot(v,tangUnit) :
 				self.cutFuel = True
 				self.mdot = 0
-				print "cutFuel"
+				#print "cutFuel"
 
 		else:
 			ThrUnit = gTurnUnit
