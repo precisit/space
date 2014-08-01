@@ -169,3 +169,5 @@ if __name__=="__main__":
 	plt.plot(r[:,0],Thrust)
 	plt.title('Thrust')
 	plt.show()
+
+	print pressure(np.array([1,2,3,4,5,6]))
