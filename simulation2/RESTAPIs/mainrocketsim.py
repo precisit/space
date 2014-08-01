@@ -44,6 +44,16 @@ def temp(param):
 			result[i] = atmofunc.temp(altitudes[i])
 		return result.tolist(), altitudes.tolist()
 
+def RocketSimulator(param):
+	if "optional" not in param:
+		"""
+		If no optional returns suggested, check what rocket to be used - predefined or custom?
+		Assumes altitude, latitude and longitude are given
+		"""
+		if 'falcon9' in param:
+
+
+
 if __name__ == '__main__':
 	params1 = {"alt":1}
 	params2 = {"alt0":1, "alt1":10000}

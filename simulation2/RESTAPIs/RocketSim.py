@@ -45,18 +45,18 @@ def GravAcc(pos):
 """
 Gor sa att pitchAlt, initialPitch och gmax satts i rocket-objektet
 """
-def RocketSim(rocket, long, lat, alt, tmax, dt, optional):
+def RocketSimulator(rocket, long, lat, alt, tmax, dt, optional):
 	t_start = 0.0
 	t_final = tmax
-	delta_t = dT
+	delta_t = dt
 	numsteps = np.floor((t_final-t_start)/delta_t)+1
 	t = np.zeros((numsteps,1))
 	t[0] = 0
 
 	at = np.radians(0) 									# Latitude
 	longi = np.radians(273)								# Longitude
-	initPos = Re*np.array([np.cos(lat)*np.cos(longi),
-				 np.cos(lat)*np.sin(longi),
+	initPos = Re*np.array([np.cos(lat)*np.cos(long),
+				 np.cos(lat)*np.sin(long),
 				 np.sin(lat)])							# Initial position vector
 	initVel = np.cross(We, initPos)						# Initial velocity vector
 
@@ -64,12 +64,18 @@ def RocketSim(rocket, long, lat, alt, tmax, dt, optional):
 					 rocket.mcurr, 0, 5885.e3]
 
 	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
-	r.set_initial_value(initial_conds, t_start).set_f_params(R)
+	r.set_initial_value(initial_conds, t_start).set_f_params(rocket)
 
 	pos = np.zeros((3, numsteps))
 	vel = np.zeros((3, numsteps))
 	deltaV = np.zeros((numsteps,1))
-
+	
+	draglosses = []
+	gravlosses = []
+	thrust = []
+	drag = []
+	pitchangle = []
+	
 	if optional['draglosses']:
 		print 'Draglosses'
 	if optional['gravlosses']:
@@ -85,7 +91,6 @@ def RocketSim(rocket, long, lat, alt, tmax, dt, optional):
 	while r.successful() and i < numsteps:
 		r.integrate(r.t + delta_t)
 		t[i] = r.t
-
 		pos[:,i] = np.array([r.y[0], r.y[2], r.y[4]])
 		vel[:,i] = np.array([r.y[1], r.y[3], r.y[5]])
 		deltaV[i] = r.y[7]
@@ -100,9 +105,9 @@ def RocketSim(rocket, long, lat, alt, tmax, dt, optional):
 			print 'Pitchangle'
 		if optional['drag']:
 			drag[i] = vel[:,i]-np.cross(We,pos[:,i])
-		r.set_f_params(R)
-
-	return pos, vel, deltaV, Draglosses, gravlosses, thrust, drag
+		r.set_f_params(rocket)
+		i+=1
+	return pos, vel, deltaV, draglosses, gravlosses, thrust, drag, pitchangle
 
 
 """
