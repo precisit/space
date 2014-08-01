@@ -70,11 +70,11 @@ def RocketSimulator(rocket, long, lat, alt, tmax, dt, optional):
 	vel = np.zeros((3, numsteps))
 	deltaV = np.zeros((numsteps,1))
 	
-	draglosses = []
-	gravlosses = []
-	thrust = []
-	drag = []
-	pitchangle = []
+	draglosses = 0
+	gravlosses = 0
+	thrust = np.array([0])
+	drag = np.array([0])
+	pitchangle = np.array([0])
 	
 	if optional['draglosses']:
 		print 'Draglosses'
@@ -107,7 +107,7 @@ def RocketSimulator(rocket, long, lat, alt, tmax, dt, optional):
 			drag[i] = vel[:,i]-np.cross(We,pos[:,i])
 		r.set_f_params(rocket)
 		i+=1
-	return pos, vel, deltaV, draglosses, gravlosses, thrust, drag, pitchangle
+	return pos.tolist(), vel.tolist(), np.max(deltaV), draglosses, gravlosses, thrust.tolist(), drag.tolist(), pitchangle.tolist()
 
 
 """

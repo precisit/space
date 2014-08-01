@@ -109,7 +109,6 @@ class Rocket:
 				self.cutFuel = True
 				self.mdot = 0
 				#print "cutFuel"
-
 		else:
 			ThrUnit = gTurnUnit
 
@@ -130,3 +129,7 @@ class Rocket:
 			print "mflow",self.mflow
 
 
+def CreateRocket(param):
+	if param['type'] == 'falcon9':
+		rocket = Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., param['payload'], 0, param['gAlt'], 2.5, param['gmax'])
+	return rocket

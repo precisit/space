@@ -12,8 +12,8 @@ optional = {'draglosses':False,
 			'thrust':False,
 			'drag':False,
 			'pitchangle':False}
-data = RocketSim.RocketSimulator(R, 0,0,200000, 4500,1, optional)
-
+data = RocketSim.RocketSimulator(R, 0,0,200000, 1000,1, optional)
+print data
 plt.scatter(data[0][0], data[0][2])
 plt.ylim([-9000000,9000000])
 plt.xlim([-9000000,9000000])
