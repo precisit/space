@@ -101,6 +101,18 @@ class AtmoTempHandler(tornado.web.RequestHandler):
         except KeyError, e:
             raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
         self.write(json.dumps(response))
+class RocketSimHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            response["position"], response['velocity'], response['time'], response['deltaV'], response['draglosses'],response['gravitylosses'], response['thrust'],response['drag'],response['pitchangle'] = mainrocketsim.RocketSimulator(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
 
 application = tornado.web.Application([
     (r"/ping", PingHandler),
@@ -111,6 +123,7 @@ application = tornado.web.Application([
     (r"/atmoPressure",AtmoPressureHandler),
     (r"/atmoDensity",AtmoDensityHandler),
     (r"/atmoTemp",AtmoTempHandler),
+    (r"/rocketSim", RocketSimHandler)
 
 ], autoreload=True)
 

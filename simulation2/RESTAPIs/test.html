@@ -94,6 +94,24 @@ $.post("/atmoTemp", jsonObj, function( result ) {
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
 
 
+var myNumbers = {
+	 alt:200000,
+	 lat:0
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/rocketSim", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('position', result.position); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('velocity', result.velocity);
+	//console.log('time', result.time);
+	console.log('deltaV', result.deltaV);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
 
 
 
