@@ -107,7 +107,7 @@ def RocketSimulator(rocket, long, lat, alt, tmax, dt, optional):
 			drag[i] = vel[:,i]-np.cross(We,pos[:,i])
 		r.set_f_params(rocket)
 		i+=1
-	return pos.tolist(), vel.tolist(), np.max(deltaV), draglosses, gravlosses, thrust.tolist(), drag.tolist(), pitchangle.tolist()
+	return pos.tolist(), vel.tolist(), t.tolist(), np.max(deltaV), draglosses, gravlosses, thrust.tolist(), drag.tolist(), pitchangle.tolist()
 
 
 """
