@@ -38,8 +38,62 @@ $.post("/atmoPressure", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
 
 	console.log('pressure', result.pressure); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-	console.log('altitude', result.Approximations);
+	console.log('altitude', result.altitude);
 }, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoPressure", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('pressure', result.pressure); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoDensity", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('density', result.density); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoTemp", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('temperature', result.temperature); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
 
 
 
