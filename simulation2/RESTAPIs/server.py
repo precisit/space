@@ -3,11 +3,12 @@ import tornado.web
 import tornado.log
 import logging
 import json
-import mainschilling
 import mainrocketsim
+import imp
 import sys
-sys.path.append('C:\Github\space\Schilling python')
+sys.path.append('C:/Github/space/Schilling python/')
 import mainschilling
+
 
 log = logging.getLogger("tornado.general")
 tornado.log.enable_pretty_logging();
@@ -75,16 +76,44 @@ class AtmoPressureHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
         self.write(json.dumps(response))
 
+class AtmoDensityHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            response["density"], response['altitude'] = mainrocketsim.density(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class AtmoTempHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            response["temperature"], response['altitude'] = mainrocketsim.temp(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
 application = tornado.web.Application([
     (r"/ping", PingHandler),
     (r"/testjs",TestjsHandler),
     (r"/deltaV",DeltaVHandler),
     (r"/Tmix",TmixHandler),
     (r"/rocketCapability",RocketCapabilityHandler),
-    (r"/atmoPressure",AtmoPressureHandler)
+    (r"/atmoPressure",AtmoPressureHandler),
+    (r"/atmoDensity",AtmoDensityHandler),
+    (r"/atmoTemp",AtmoTempHandler),
 
 ], autoreload=True)
 
 #TODO: https on prod
-application.listen(8020)
+application.listen(8000)
 tornado.ioloop.IOLoop.instance().start()

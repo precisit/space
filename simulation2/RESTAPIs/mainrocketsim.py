@@ -10,7 +10,7 @@ import ascTime
 
 def pressure(param):
 	if "alt" in param:
-		return atmofunc.pressure(param["alt"])
+		return atmofunc.pressure(param["alt"]).tolist(), param["alt"]
 	else:
 		if not "res" in param:
 			param["res"] = 10
@@ -22,7 +22,7 @@ def pressure(param):
 
 def density(param):
 	if "alt" in param:
-		return atmofunc.density(param["alt"])
+		return atmofunc.density(param["alt"]).tolist(), param["alt"]
 	else:
 		if not "res" in param:
 			param["res"] = 10
@@ -34,7 +34,7 @@ def density(param):
 
 def temp(param):
 	if "alt" in param:
-		return atmofunc.temp(param["alt"])
+		return atmofunc.temp(param["alt"]).tolist(), param["alt"]
 	else:
 		if not "res" in param:
 			param["res"] = 10
@@ -76,4 +76,8 @@ if __name__ == '__main__':
 	print temp(params1)
 	print temp(params2)
 	print temp(params3)
+
+	asdf = {}
+	asdf["pressure"], asdf["alt"] = pressure(params1)
+	print asdf
 
