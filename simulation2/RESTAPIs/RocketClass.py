@@ -91,7 +91,7 @@ class Rocket:
 		tangUnit = atmofunc.unit(tangent)
 		#apsis = OC.ApsisCalculation(pos,v)
 		if self.firstcall:
-			ThrUnit = np.cos(np.radians(4))*posUnit + np.sin(np.radians(4))*vUnit
+			ThrUnit = atmofunc.unit(np.cos(np.radians(4))*posUnit + np.sin(np.radians(4))*vUnit)
 			self.firstcall = False
 			self.initThrust = ThrUnit
 		elif (alt < self.nAlt):
