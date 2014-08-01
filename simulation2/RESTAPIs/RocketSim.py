@@ -43,6 +43,69 @@ def GravAcc(pos):
 	return -pos*consts.G*Me/(np.linalg.norm(pos)**3)
 
 """
+Gor sa att pitchAlt, initialPitch och gmax satts i rocket-objektet
+"""
+def RocketSim(rocket, long, lat, alt, tmax, dt, optional):
+	t_start = 0.0
+	t_final = tmax
+	delta_t = dT
+	numsteps = np.floor((t_final-t_start)/delta_t)+1
+	t = np.zeros((numsteps,1))
+	t[0] = 0
+
+	at = np.radians(0) 									# Latitude
+	longi = np.radians(273)								# Longitude
+	initPos = Re*np.array([np.cos(lat)*np.cos(longi),
+				 np.cos(lat)*np.sin(longi),
+				 np.sin(lat)])							# Initial position vector
+	initVel = np.cross(We, initPos)						# Initial velocity vector
+
+	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
+					 rocket.mcurr, 0, 5885.e3]
+
+	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
+	r.set_initial_value(initial_conds, t_start).set_f_params(R)
+
+	pos = np.zeros((3, numsteps))
+	vel = np.zeros((3, numsteps))
+	deltaV = np.zeros((numsteps,1))
+
+	if optional['draglosses']:
+		print 'Draglosses'
+	if optional['gravlosses']:
+		print 'Gravlosses'
+	if optional['thrust']:
+		thrust = np.zeros((numsteps,1))
+	if optional['drag']:
+		drag = np.zeros((3,numsteps))
+	if optional['pitchangle']:
+		print 'Pitchangle'
+
+	i=1
+	while r.successful() and i < numsteps:
+		r.integrate(r.t + delta_t)
+		t[i] = r.t
+
+		pos[:,i] = np.array([r.y[0], r.y[2], r.y[4]])
+		vel[:,i] = np.array([r.y[1], r.y[3], r.y[5]])
+		deltaV[i] = r.y[7]
+
+		if optional['draglosses']:
+			print 'Draglosses'
+		if optional['gravlosses']:
+			print 'Gravlosses'
+		if optional['thrust']:
+			thrust[i] = r.y[8]
+		if optional['pitchangle']:
+			print 'Pitchangle'
+		if optional['drag']:
+			drag[i] = vel[:,i]-np.cross(We,pos[:,i])
+		r.set_f_params(R)
+
+	return pos, vel, deltaV, Draglosses, gravlosses, thrust, drag
+
+
+"""
 Test program
 """
 if __name__ == '__main__':
@@ -63,6 +126,7 @@ if __name__ == '__main__':
 	numsteps = np.floor((t_final-t_start)/delta_t)+1 	
 	t = np.zeros((numsteps,1))
 	t[0] = 0
+
 	"""
 	Rocket initial conditions
 	"""
