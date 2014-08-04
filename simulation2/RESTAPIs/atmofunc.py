@@ -100,9 +100,9 @@ def unit(vec):
 	return unit
 
 	# efficient thrust as a function of position and current massflow. Ae is the area of the nozzle exit.
-def thrustEff(Ispvac,Ae,r,mdot):
+def thrustEff(Ispvac,Ae,r,mdot, ispb=0, mdotb=0,Aeb=0,):
 	alt = inertToAlt(r)
-	Teff = Ispvac*constants.g*mdot - Ae*pressure(alt)
+	Teff = Ispvac*constants.g*mdot+ispb*constants.g*mdotb- (Ae+Aeb)*pressure(alt)
 	if (Teff<0):
 		Teff=0
 	return Teff

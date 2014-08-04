@@ -60,7 +60,6 @@ class Rocket:
 		else:
 			self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 			self.mcurr = self.mfuelCurrent+self.md2+self.mi2+self.mp
-				
 
 	def MainController(self, t):
 		if self.cutFuel:
