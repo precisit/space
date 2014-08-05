@@ -92,19 +92,24 @@ while i < len(Pe[:,0]):
 allpoints = np.array([allx,allPe]).T
 
 
-tck = interpolate.CloughTocher2DInterpolator(allpoints,ally)
+tck1 = interpolate.CloughTocher2DInterpolator(allpoints,ally)
+tck2 = interpolate.LinearNDInterpolator(allpoints,ally)
+tck3 = interpolate.NearestNDInterpolator(allpoints,ally)
+tck = [tck1, tck2, tck3]
 x = np.linspace(allx.min(),allx.max(),200)
-Peplot = np.linspace(Pe[0,0], Pe[len(Pe)-1,0], 200)
+for j in range(3):
+	Peplot = np.linspace(Pe[0,0], Pe[len(Pe)-1,0], 200)
 
-for i in range(len(Peplot)):
-	plt.plot(x,tck(x,Peplot[i]))
+	for i in range(len(Peplot)):
+		plt.plot(x,tck[j](x,Peplot[i]))
 
-for i in range(len(datain[:,0,0])):
-	plt.plot(datain[i,:,0],datain[i,:,1],'r+')
+	for i in range(len(datain[:,0,0])):
+		plt.plot(datain[i,:,0],datain[i,:,1],'r+')
 
-plt.show()
+	plt.show()
 
+chosentck = int(raw_input("which one was better? (1,2,3)")) - 1
 savefile = str(raw_input("file for saving function variables? (<n> to cancel save):"))
 if savefile is not "n":
-	pickle.dump(tck,open(savefile,'wb'))
+	pickle.dump(tck[chosentck],open(savefile,'wb'))
 	print "saved as ",savefile
