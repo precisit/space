@@ -46,6 +46,7 @@ def Vcirc(alt):
 	#test
 if __name__ == "__main__":
 	#rocket data
+	"""
 	Isp1SL = 321
 	Isp1V = 363
 	m1wet = 2449399
@@ -71,6 +72,35 @@ if __name__ == "__main__":
 	alt = 200000
 	lat = 26
 	incl = 26
+	ssT = 0 						# stage separation time. antar ingen thrust under denna tid
+	Tmix = ascTime.Tmix(m1b, Isp1SL, T1, m2b, Isp2V, T2, Vcirc(alt), Isp1V, A0, ssT) # antar haer att deltaVp i schilling = Vcirc
+	"""
+	#rocket data
+	Isp1SL = 282.
+	Isp1V = 320.
+	m1wet = 402000.
+	m1dry = 16000.
+	m1res = 3900.
+	T1 = 5885.0e3
+	m1b = m1wet - m1dry - m1res
+
+	# 
+	Isp2V = 345.
+	m2wet = 90720
+	m2dry = 3200
+	m2res = 182
+	T2 = 800.0e3
+	m2b = m2wet - m2dry - m2res
+
+	mp = 10000
+
+	A0 = T1/(m1wet + m2wet + mp) # + payload!!!!
+	print "A0", A0
+
+	#launch data
+	alt = 300000
+	lat = 28
+	incl = 28
 	ssT = 0 						# stage separation time. antar ingen thrust under denna tid
 	Tmix = ascTime.Tmix(m1b, Isp1SL, T1, m2b, Isp2V, T2, Vcirc(alt), Isp1V, A0, ssT) # antar haer att deltaVp i schilling = Vcirc
 
