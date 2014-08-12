@@ -6,8 +6,15 @@ import pickle
 from pylab import ginput, axis
 from mpl_toolkits.mplot3d import Axes3D
 
-source = str(raw_input("file? (<l> to load last known values):"))
+"""
+Script for interpolation in 2 dimensions. The user specifies file to load and dimensions of the 
+image. Points to interpolate are defined by the mouse clicks of the user in the image. 
 
+"""
+source = str(raw_input("file? (<l> to load last known values):"))
+#
+# The image file to load must be in the format .png. The command 'l' loads previous values.
+#
 if source is "l":
 	datain = np.load("xyvalues.npy")
 	Pe = np.load("Pevalues.npy")
@@ -26,6 +33,14 @@ else:
 	numClicks = int(raw_input("number of clicks?"))
 	datain = np.zeros([numoflines,numClicks,2])
 	Pe = np.zeros([numoflines,numClicks])
+	
+	#
+	# When the user has clicked the specified number of times, the previous clicks will not be visible
+	# and the user must close the current image. The program then asks for the value 'Pe' which is the
+	# constant value representing the line on the graph. This will iterate a number of times based on the 
+	# number of lines
+	#
+	
 	for i in range(numoflines):
 		plt.imshow(currimg)
 		curr = np.array(ginput(numClicks, timeout=100))
@@ -33,18 +48,28 @@ else:
 		Pecurr = float(raw_input("Pe?:"))
 		Pe[i,:] = np.ones(numClicks)*Pecurr
 		plt.show()
+	#
+	# These values are the dimension of the image from which to extrapolate
+	#
 
 	left = float(raw_input("left:"))
 	right = float(raw_input("right:"))
 	lower = float(raw_input("lower:"))
 	upper = float(raw_input("upper:"))
 
+	#
+	# The values are scaled to the dimensions specified. The y-axis is reversed.
+	#
 
 	datain[:,:,1] = currimg.shape[0] - datain[:,:,1]
 	datain[:,:,0] = left + (right-left)*datain[:,:,0]/currimg.shape[1]
 	datain[:,:,1] = lower + (upper-lower)*datain[:,:,1]/currimg.shape[0]
-
-
+	
+	#
+	# In this loop an extra number of lines are created between the lines specified by the user until the number
+	# of values for Pe corresponds to the number of xy-values.
+	#
+	
 	while len(Pe[:,0]) < numClicks:
 		length = 2*len(Pe[:,0])-1
 		meanArr = np.zeros([len(Pe[:,0])-1, numClicks, 2])
@@ -72,6 +97,9 @@ else:
 	np.save("Pevalues",Pe)
 	np.save("input",np.array([numoflines,numClicks,left,right,lower,upper]))
 
+#
+# The "mean-value"-lines are plotted
+#
 for i in range(len(datain[:,0,0])):
 	plt.plot(datain[i,:,0],datain[i,:,1])
 	
@@ -82,6 +110,11 @@ allx = datain[0,:,0]
 allPe = Pe[0,:]
 
 ally = datain[0,:,1]
+
+#
+# In this loop, the clicks are put in arrays of the form ([x0,Pe0], [x1,Pe1] ....) and (y0, y1, y2 ....)
+#
+
 i=1
 while i < len(Pe[:,0]):
 	allx = np.append(allx, datain[i,:,0])
@@ -91,6 +124,9 @@ while i < len(Pe[:,0]):
 
 allpoints = np.array([allx,allPe]).T
 
+# 
+# Three different interpolation-methods are used and plotted for the user to see
+#
 
 tck1 = interpolate.CloughTocher2DInterpolator(allpoints,ally)
 tck2 = interpolate.LinearNDInterpolator(allpoints,ally)
@@ -107,6 +143,9 @@ for j in range(3):
 		plt.plot(datain[i,:,0],datain[i,:,1],'r+')
 
 	plt.show()
+#
+# 1 corresponds to the cubic spline-interpolator, 2 to the linear, and 3 to the nearest neighbour-interpolator
+#
 
 chosentck = int(raw_input("which one was better? (1,2,3)")) - 1
 savefile = str(raw_input("file for saving function variables? (<n> to cancel save):"))

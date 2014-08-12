@@ -3,7 +3,34 @@ import numpy as np
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import pickle
+"""
+This script simply loads the coefficients for the functions and returns the values of said functions. The functions are:
 
+OMR : Optimum Mixture Ratio
+defined on the interval, for liquid oxygen and kerosene:
+Pe = [0.1, 1]
+and for liquid oxygen and methane:
+Pe = [0.1, 1]
+
+AFT : Adiabatic Flame Temperature
+defined on the interval, for liquid oxygen and kerosene:
+Pe = [2.2, 2.4]
+and for liquid oxygen and methane:
+Pe = [2.7, 2.9]
+
+
+GMW : Gas Molecular Weight
+defined on the interval, for liquid oxygen and kerosene:
+Pe = [2.2, 2.4]
+and for liquid oxygen and methane:
+Pe = [2.7, 2.9]
+
+SHR : Specific Heat Ratio
+defined on the interval, for liquid oxygen and kerosene:
+Pe = [2.2, 2.4]
+and for liquid oxygen and methane:
+Pe = [2.7, 2.9]
+"""
 OKRtck = pickle.load(open('C:/Github/space/propellant/OK-R.pk1'))
 OKMtck = pickle.load(open('C:/Github/space/propellant/OK-M.pk1'))
 OKTtck = pickle.load(open('C:/Github/space/propellant/OK-T.pk1'))
@@ -12,6 +39,8 @@ OMRtck = pickle.load(open('C:/Github/space/propellant/OM-R.pk1'))
 OMMtck = pickle.load(open('C:/Github/space/propellant/OM-M.pk1'))
 OMTtck = pickle.load(open('C:/Github/space/propellant/OM-T.pk1'))
 OMKtck = pickle.load(open('C:/Github/space/propellant/OM-K.pk1'))
+
+OKMtck2lines = pickle.load(open('C:/Github/space/propellant/OK-M2lines.pk1'))
 
 def OMR(params):
 	if params["fuel"].lower() == 'loxker':
@@ -88,3 +117,11 @@ if __name__ == '__main__':
 		for j in range(10):
 			plt.plot(x,values[1,i,:,j])
 		plt.show()
+
+
+	twolines = np.zeros(100) 
+	for i in range(10):
+		twolines = OKMtck2lines(x,Pe[0,1,i])
+		plt.plot(x,twolines,x,values[0,2,:,i])
+	plt.show()
+
