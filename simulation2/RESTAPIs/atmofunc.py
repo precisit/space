@@ -67,7 +67,7 @@ def inertToSurf(vi,ri):
 	vr = inertToSurfVel(vi,ri)
 	alt = inertToAlt(ri)
 	return vr,alt
-
+	
 def inertToAlt(ri):
 	alt = np.linalg.norm(ri)-Re
 	return alt
@@ -100,7 +100,7 @@ def unit(vec):
 	return unit
 
 	# efficient thrust as a function of position and current massflow. Ae is the area of the nozzle exit.
-def thrustEff(Ispvac,Ae,r,mdot, ispb=0, mdotb=0,Aeb=0,):
+def thrustEff(Ispvac,Ae,r,mdot, ispb=0, mdotb=0,Aeb=0):
 	alt = inertToAlt(r)
 	Teff = Ispvac*constants.g*mdot+ispb*constants.g*mdotb- (Ae+Aeb)*pressure(alt)
 	if (Teff<0):

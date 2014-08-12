@@ -14,6 +14,8 @@ class Rocket:
 				mw1, md1, mi1, isp1v, isp1sl, thr1sl,
 				mw2=0, md2=0, mi2=0, isp2v=0, thr2v=0,
 				mw3=0, md3=0, mi3=0, isp3v=0, thr3v=0, booster=False):
+
+		#self.AP = AP.AscentPath(turnStartAltitude, turnEndAltitude, desiredOrbitAltitude)
 		self.t = t
 		self.stage1 = True
 		self.stage2 = True
@@ -44,7 +46,7 @@ class Rocket:
 		self.mfuel3 = mw3-mi3-md3
 		self.mdot1 = thr1sl/(isp1sl*consts.g)
 		self.mdot2 = thr2v/(isp2v*consts.g)
-		if self.mw3 != 0:
+		if mw3 != 0:
 			self.mdot3 = thr3v/(isp3v*consts.g)
 
 		self.mdot = self.mdot1
@@ -58,8 +60,8 @@ class Rocket:
 		self.mdot
 		self.mp = mp
 
+		self.targetAltitude = targetAltitude
 		self.nAlt = nAlt
-		self.targetAltitude=targetAltitude
 		self.nT = nT
 		self.nStartT = None
 
@@ -93,7 +95,8 @@ class Rocket:
 			else:
 				self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 				self.mcurr = self.mfuelCurrent+self.mi2+self.md2+self.mp
-		else:
+
+	 	else:
 			if self.mfuelCurrent > self.mfuel2 + self.mfuel3:
 				self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 				self.mcurr = self.mfuelCurrent + self.md1+self.md2+self.mi1+self.mi2+self.md3+self.mi3+self.mp
@@ -101,7 +104,6 @@ class Rocket:
 			elif self.mfuelCurrent < self.mfuel2+self.mfuel3 and self.mfuelCurrent > self.mfuel3:
 				self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 				self.mcurr = self.mfuelCurrent+self.md2+self.mi2+self.mi3+self.md3+self.mp
-
 			else:
 				self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 				self.mcurr = self.mfuelCurrent+self.mi3+self.md3+self.mp	
@@ -112,7 +114,6 @@ class Rocket:
 		else:
 			if self.mfuelCurrent <= 0:
 				self.mdot = 0
-
 			else:
 				if self.booster:
 			 		if self.mfuelCurrent > self.mfuel2:
@@ -129,6 +130,7 @@ class Rocket:
 					else:
 						self.mdot = self.mdot2
 						self.isp = self.isp2v
+		
 				else:
 					if self.mfuelCurrent > self.mfuel2 + self.mfuel3:
 						self.mdot = self.mdot1
@@ -139,6 +141,7 @@ class Rocket:
 					elif self.mfuelCurrent <= self.mfuel3:
 						self.mdot = self.mdot3
 						self.isp = self.isp3v
+				print self.mdot, self.mfuelCurrent
 		self.SetMass(t)
 		self.t = t
 
@@ -167,17 +170,39 @@ class Rocket:
 		elif (t - self.nStartT < self.nT):
 			ThrUnit = atmofunc.unit(np.cos(np.radians(45))*tangUnit + np.sin(np.radians(45))*gTurnUnit)
 			#print "nudging!", np.linalg.norm(ThrUnit)
-		elif  (alt>self.targetAltitude):
+		elif  (alt > self.targetAltitude):
 			ThrUnit = tangUnit
 			if OC.GetOrbitSpeed(pos) < np.dot(v,tangUnit) :
 				self.cutFuel = True
 				self.mdot = 0
-				#print "cutFuel"
 		else:
 			ThrUnit = gTurnUnit
 
 		self.accLimit(F)
 		Thrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot*self.mflow, self.isp3v, self.mdotb, self.Ae3) 
+		return Thrust*ThrUnit
+
+	def thrustAlgorithm(self, AscentPath, pos, vel):
+		altitude = np.linalg.norm(pos)-Re
+		if np.linalg.norm(vel) != 0:
+			apoapsis = np.max([OC.ApsisCalculation(pos, vel)[1],OC.ApsisCalculation(pos, vel)[1]])
+		else:
+			apoapsis = 0
+		
+		if apoapsis >= AscentPath.desiredOrbitAltitude:
+			ThrUnit = np.array([0,0,0])
+			self.cutFuel=True
+			# Coasting to apoapsis
+		else:
+			FPA = np.radians(AscentPath.FlightPathAngle(altitude)) #Flight path angle
+			horizonVector = np.cross(pos,np.cross(vel,pos))
+			horizonUnitVector = atmofunc.unit(horizonVector)
+			positionUnitVector = atmofunc.unit(pos)
+
+			ThrUnit = np.cos(FPA)*horizonUnitVector + np.sin(FPA)*positionUnitVector
+
+		Thrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot*self.mflow, self.isp3v, self.mdotb, self.Ae3)
+
 		return Thrust*ThrUnit
 
 	def accLimit(self,F):
@@ -190,32 +215,32 @@ class Rocket:
 
 def CreateRocket(param):
 	if param['type'] == 'falcon9':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'], param['alt'],
 						402000., 16000., 3900., 320., 280., 5885.e3,
 						90720., 3200., 182., 345)
 	elif param['type'] == 'saturnv':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'], param['alt'],
 							2286217, 135218, 0, 304, 265, 38703000,
 							490778, 39048, 0, 421, 5.17e6,
 							119900, 13300, 0, 421, 1.03e6, False)
 	elif param['type'] == 'ariane5':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'], param['alt'],
 							170800, 1.27e4, 0, 430, 340, 1.1114e6,
 						   	1.25e4, 2.7e3,  0, 324, 2.24e4,
 						  	555000, 79600, 0, 275, 6.47e6, True)
 	elif param['type'] == 'soyuz2b':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 3,param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 3,param['gmax'], param['alt'],
 							105400, 6875, 0, 311, 245, 9.99e5,
 						   	25200, 2355,  0, 359, 2.94e5,
 						  	177600, 15240, 0, 310, 4084000, True)
 	elif param['type'] == 'atlasv':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'], param['alt'],
 							306914, 22461, 0, 338, 253, 4.1e6,
 						   	22825, 2026,  0, 451, 9.9e4,
 						  	81648, 8000, 0, 310, 2.54e6, True)
 	elif param['type'] == 'custom':
 		stats = param['stats']
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'], param['alt'],
 						stats['mw1'], stats['md1'], stats['mi1'], stats['isp1v'], stats['isp1sl'], stats['thr1sl'],
 						stats['mw2'], stats['md2'], stats['mi2'], stats['isp2v'], stats['thr2v'],
 						stats['mw3'], stats['md3'], stats['mi3'], stats['isp3v'], stats['thr3v'], stats['booster'])

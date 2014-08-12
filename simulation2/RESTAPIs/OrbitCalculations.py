@@ -1,40 +1,96 @@
-import math
 import numpy as np
 import scipy.constants as consts
 
 # Earth constants
 Me = 5.97219e24
 Re = 6371000
-We = np.array([0,0,2*math.pi/(24*60*60)])
-
-
-
-def ApsisCalculation(r,v):
+We = np.array([0,0,2*np.pi/(24*60*60)])
+Get
+def ApsisCalculation(pos,vel):
 	"""
 	Calculates and returns periapsis anmd apoapsis with the current position and velocity vectors
 	"""
-	normR1 = np.linalg.norm(r)
-	normV1 = np.linalg.norm(v)
-	gamma1 = angleVec(r,v)
-
-	#gamma1 = math.acos(np.dot(r,v)/(normR1*normV1))
+	normR1 = np.linalg.norm(pos)
+	normV1 = np.linalg.norm(vel)
+	gamma1 = AngleBetweenVectors(pos,vel)
 
 	C = 2*consts.G*Me/(normR1*normV1**2)
-	D = math.sqrt(C**2-4*(1-C)*(-math.sin(gamma1)**2))
+	D = np.sqrt(C**2-4*(1-C)*(-np.sin(gamma1)**2))
 
 	Rp = normR1*(-C-D)/(2*(1-C))
 	Ra = normR1*(-C+D)/(2*(1-C))
-	oD = orthDist(Ra,Rp)
 
-	return np.array([Rp, Ra, oD])
+	apsides = np.array([np.linalg.norm(normR1*(-C-D)/(2*(1-C))), np.linalg.norm(normR1*(-C+D)/(2*(1-C)))])
+	oD = OrthogonalDistance(Ra,Rp)
 
-def angleVec(v1,v2):
-	cosang = np.dot(v1,v2)
-	sinang = np.linalg.norm(np.cross(v1,v2))
+	return np.array([np.min(apsides), np.max(apsides), oD])
+
+def AngleBetweenVectors(vect1,vect2):
+	""" Calculates the angle bewteen two vectors """
+	cosang = np.dot(vect1,vect2)
+	sinang = np.linalg.norm(np.cross(vect1,vect2))
 	return np.arctan2(sinang,cosang)
 
-def orthDist(Ra,Rp):
+def OrthogonalDistance(Ra,Rp):
 	return 2*Rp*Ra/(Rp + Ra)
 
-def escVel(pos):
-	return np.sqrt(Me*consts.G/np.linalg.norm(pos))
+def GetOrbitSpeed(radius):
+	""" Calculates the orbital speed at altitude radius"""
+	return np.sqrt(consts.G*Me/np.linalg.norm(radius))
+
+def GetHorizontalUnitVector(position, velocity):
+	""" Returns a unit vector which lies in current horizontal plane for the orbiting body."""
+	return np.cross(position, np.cross(velocity, position))
+
+def GetTrueAnomaly(pos, vel):
+	""" Calculates the true anomaly, i.e. the angular distance from the periapsis to the orbiting
+	body. """
+	horizonVector = GetHorizontalUnitVector(pos, vel)
+	flighPathAngle = AngleBetweenVectors(horizonVector, vel)
+	C = np.linalg.norm(pos)*np.linalg.norm(vel)**2/(consts.G*Me)
+	return np.arctan( (C*np.cos(flighPathAngle)*np.sin(flighPathAngle))/(C*np.cos(flighPathAngle)-1) )
+
+
+def DeltaVToCircular(OrbitRadius, pos, vel):	
+	""" Calculates the additional delta-V needed for circular orbit at OrbitRadius
+	for the vehicle with position and velocity pos, vel."""
+
+	horizontalUnitVector = lg.GetHorizontalUnitVector(pos, vel)
+	desiredVelocity =  GetOrbitSpeed(OrbitRadius)
+	currentVelocity = vel*horizontalVector
+	return desiredVelocity-currentVelocity
+
+def GetEccentricity(pos, vel):
+	""" Calculates the eccentricity of the current orbit """
+
+	apsides = ApsisCalculation(pos,vel)
+	periapsis = np.linalg.norm(np.min(apsides))
+	apoapsis = np.linalg.norm(np.max(apsides))
+	return (apoapsis-periapsis)/(apoapsis+periapsis)
+
+def TimeToApoapsis(pos, vel):
+	""" Calculates the time it will take to reach apoapsis for the vehicle """
+	apsides = ApsisCalculation(pos, vel)
+
+	semiMajorAxis = (np.linalg.norm(apsides[0])+np.linalg.norm(apsides[1]))/2
+
+	meanMotion = np.sqrt((consts.G*Me)/semiMajorAxis**3)
+
+	eccentricity = GetEccentricity(pos, vel)
+
+	trueAnomaly = GetTrueAnomaly(pos, vel)
+
+	eccentricAnomalyNow = np.arccos((eccentricity+np.cos(trueAnomaly))/(1+eccentricity*np.cos(trueAnomaly)))
+	eccentricAnomalyAtPeriapsis = np.arccos((eccentricity+np.cos(np.pi))/(1+eccentricity*np.cos(np.pi)))
+
+	meanAnomalyNow = eccentricAnomalyNow - eccentricity*np.sin(eccentricAnomalyNow)
+	meanAnomalyAtPeriapsis = eccentricAnomalyAtPeriapsis - eccentricity*np.sin(eccentricAnomalyAtPeriapsis)
+
+	timeToApoapsis = (meanAnomalyAtPeriapsis-meanAnomalyNow)/(meanMotion)
+
+	return timeToApoapsis
+
+def CalculateBurnTime(rocket, deltaV):
+	""" Calculates how much the rocket will have to perform a burn to increase the deltaV """
+
+	return (rocket.mcurr/rocket.mdot)*(1-np.exp(-deltaV/(rocket.isp*consts.g)))
