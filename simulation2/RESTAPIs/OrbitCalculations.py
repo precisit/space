@@ -5,7 +5,7 @@ import scipy.constants as consts
 Me = 5.97219e24
 Re = 6371000
 We = np.array([0,0,2*np.pi/(24*60*60)])
-Get
+
 def ApsisCalculation(pos,vel):
 	"""
 	Calculates and returns periapsis anmd apoapsis with the current position and velocity vectors
@@ -50,7 +50,6 @@ def GetTrueAnomaly(pos, vel):
 	C = np.linalg.norm(pos)*np.linalg.norm(vel)**2/(consts.G*Me)
 	return np.arctan( (C*np.cos(flighPathAngle)*np.sin(flighPathAngle))/(C*np.cos(flighPathAngle)-1) )
 
-
 def DeltaVToCircular(OrbitRadius, pos, vel):	
 	""" Calculates the additional delta-V needed for circular orbit at OrbitRadius
 	for the vehicle with position and velocity pos, vel."""
@@ -94,3 +93,16 @@ def CalculateBurnTime(rocket, deltaV):
 	""" Calculates how much the rocket will have to perform a burn to increase the deltaV """
 
 	return (rocket.mcurr/rocket.mdot)*(1-np.exp(-deltaV/(rocket.isp*consts.g)))
+
+def FlightPathAngle(rocket, altitude):
+	""" Calculates and return the recommended flight path angle according
+	to MechJeb """
+	turnShapeExponent = 0.3
+	turnEndAngle = 0
+
+	if altitude < rocket.nAlt: return 90
+	if altitude > self.turnEndAltitude: return turnEndAngle
+	return Clamp(90.-((float)(altitude-rocket.nAlt)/(rocket.targetAltitude-rocket.nAlt))**turnShapeExponent*(90.-turnEndAngle),0.0, 89.99)
+	
+def Clamp(value, minimum, maximum):
+	return np.max(np.array([minimum, np.min( np.array([maximum, value]))]))
