@@ -3,7 +3,7 @@ from scipy import integrate
 import atmofunc
 import matplotlib.pyplot as plt
 import scipy.constants as consts
-import RocketClass as RC
+import RocketClass3stage as RC
 import OrbitCalculations as OC
 import time as timer
 import ascTime
@@ -55,9 +55,12 @@ def RocketSimulator(param):
 		elif param['rocket'].lower() == 'falcon9':
 			rocketparams['type'] = 'falcon9'
 			rocketparams['stats'] = 0
+		elif param['rocket'].lower() == 'saturnv':
+			rocketparams['type'] = 'saturnv'
+			rocketparams['stats'] = 0
 		else:
 			rocketparams['type'] = 'custom'
-			rocketparams['stats'] = params['stats']
+			rocketparams['stats'] = param['stats']
 	else:
 		rocketparams['type'] = 'falcon9'
 		rocketparams['stats'] = 0
@@ -65,7 +68,6 @@ def RocketSimulator(param):
 	if 'payload' in param:
 		rocketparams['payload'] = param['payload']
 	else:
-		"""mpsolver"""
 		rocketparams['payload'] = 10000
 	if 'pitchAlt' in param:
 		rocketparams['gAlt'] = param['pitchalt']
@@ -76,6 +78,8 @@ def RocketSimulator(param):
 		rocketparams['gmax'] = param['gmax']
 	else:
 		rocketparams['gmax'] = 1000
+
+	rocketparams['tAlt'] = param['tAlt']
 
 	"""Time parameters"""
 
@@ -96,9 +100,17 @@ def RocketSimulator(param):
 	"""Optional params"""
 	if 'optional' not in param:
 		optional = {'draglosses':False, 'gravlosses':False, 'thrust':False, 'drag':False, 'pitchangle':False}
+	else:
+		optional = param['optional']
+		if 'draglosses' not in optional: optional['draglosses'] = False
+		if 'gravlosses' not in optional: optional['gravlosses'] = False
+		if 'drag' not in optional: optional['drag'] = False
+		if 'pitchangle' not in optional: optional['pitchangle'] = False
+		if 'thrust' not in optional: optional['thrust'] = False
+
 
 	rocket = RC.CreateRocket(rocketparams)
-	data = RocketSim.RocketSimulator(rocket, longi, param['lat'], param['alt'], tmax, dt, optional)
+	data = RocketSim.RocketSimulator(rocket, longi, param['lat'], tmax, dt, optional)
 	return data
 
 

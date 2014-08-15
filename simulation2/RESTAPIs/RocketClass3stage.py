@@ -3,7 +3,6 @@ import atmofunc
 import numpy as np
 import scipy.constants as consts
 import OrbitCalculations as OC
-import AscentPath as AP
 
 Re = 6371000.
 Me = 5.97219e24
@@ -33,17 +32,23 @@ class Rocket:
 		self.isp2v = isp2v
 		self.thr2v = thr2v
 
-		self. mw3 = mw3
+		self.mw3 = mw3
 		self.md3 = md3
 		self.mi3 = mi3
 		self.thr3v = thr3v
 		self.isp3v = isp3v
 
+		self.deltaVreq = 0
+		self.timetoApo = 0
+		self.tStart = 0
+
 		self.mfuel1 = mw1-mi1-md1
 		self.mfuel2 = mw2-mi2-md2
 		self.mfuel3 = mw3-mi3-md3
 		self.mdot1 = thr1sl/(isp1sl*consts.g)
-		self.mdot2 = thr2v/(isp2v*consts.g)
+		if self.mw2 != 0:
+			self.mdot2 = thr2v/(isp2v*consts.g)
+		self.mdotsave = 0
 		if self.mw3 != 0:
 			self.mdot3 = thr3v/(isp3v*consts.g)
 
@@ -71,7 +76,9 @@ class Rocket:
 
 		self.mcurr = mw1+mw2+mw3+mp
 		self.Ae = atmofunc.Ae(isp1v, self.mdot1, self.thr1sl)
-		self.Ae2 = atmofunc.Ae(isp2v, self.mdot2, self.thr2v)
+		if mw2 != 0:
+			self.Ae2 = atmofunc.Ae(isp2v, self.mdot2, self.thr2v)
+		else:	self.Ae2 = 0
 		if mw3 != 0:
 			self.Ae3 = atmofunc.Ae(isp3v, self.mdot3, self.thr3v)
 		else: self.Ae3 = 0
@@ -180,6 +187,33 @@ class Rocket:
 		Thrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot*self.mflow, self.isp3v, self.mdotb, self.Ae3) 
 		return Thrust*ThrUnit
 
+	def ThrustAlgorithm(self, pos, vel):
+		altitude = np.linalg.norm(pos)-Re
+		if np.linalg.norm(vel) != 0:
+			apoapsis = OC.ApsisCalculation(pos, vel)[1]
+		else:
+			apoapsis = 0
+		
+		if apoapsis-Re >= self.targetAltitude:
+			print apoapsis
+			horizonVector = np.cross(pos,np.cross(vel,pos))
+			ThrUnit = atmofunc.unit(horizonVector)
+			self.cutFuel=True
+			# Coasting to apoapsis
+		else:
+			#print OC.FlightPathAngle(self, altitude), altitude
+			FPA = np.radians(OC.FlightPathAngle(self, altitude)) #Flight path angle
+			horizonVector = np.cross(pos,np.cross(vel,pos))
+			horizonUnitVector = atmofunc.unit(horizonVector)
+			positionUnitVector = atmofunc.unit(pos)
+
+			ThrUnit = np.cos(FPA)*horizonUnitVector + np.sin(FPA)*positionUnitVector
+
+		Thrust = atmofunc.thrustEff(self.isp,self.Ae,pos,self.mdot*self.mflow, self.isp3v, self.mdotb, self.Ae3)
+
+		return Thrust*ThrUnit
+
+
 	def accLimit(self,F):
 		adif = F/self.mcurr - self.alim
 		if (adif < 0):
@@ -190,32 +224,34 @@ class Rocket:
 
 def CreateRocket(param):
 	if param['type'] == 'falcon9':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.6, param['gmax'], param['tAlt'],
 						402000., 16000., 3900., 320., 280., 5885.e3,
-						90720., 3200., 182., 345)
+						90720., 3200., 182., 345, 800e3, False)
 	elif param['type'] == 'saturnv':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],param['tAlt'],
 							2286217, 135218, 0, 304, 265, 38703000,
 							490778, 39048, 0, 421, 5.17e6,
 							119900, 13300, 0, 421, 1.03e6, False)
 	elif param['type'] == 'ariane5':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],param['tAlt'],
 							170800, 1.27e4, 0, 430, 340, 1.1114e6,
 						   	1.25e4, 2.7e3,  0, 324, 2.24e4,
 						  	555000, 79600, 0, 275, 6.47e6, True)
 	elif param['type'] == 'soyuz2b':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 3,param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 3,param['gmax'],param['tAlt'],
 							105400, 6875, 0, 311, 245, 9.99e5,
 						   	25200, 2355,  0, 359, 2.94e5,
 						  	177600, 15240, 0, 310, 4084000, True)
 	elif param['type'] == 'atlasv':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],param['tAlt'],
 							306914, 22461, 0, 338, 253, 4.1e6,
 						   	22825, 2026,  0, 451, 9.9e4,
 						  	81648, 8000, 0, 310, 2.54e6, True)
 	elif param['type'] == 'custom':
-		stats = param['stats']
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],
+		stats = {'mw2':0, 'md2':0, 'mi2':0, 'isp2v':0, 'thr2v':0, 'mw3':0, 'md3':0, 'mi3':0, 'isp3v':0, 'thr3v':0, 'booster':False}
+		stats.update(param['stats'])
+
+		rocket = Rocket(param['payload'], 	 param['gAlt'], 2.5, param['gmax'],param['tAlt'],
 						stats['mw1'], stats['md1'], stats['mi1'], stats['isp1v'], stats['isp1sl'], stats['thr1sl'],
 						stats['mw2'], stats['md2'], stats['mi2'], stats['isp2v'], stats['thr2v'],
 						stats['mw3'], stats['md3'], stats['mi3'], stats['isp3v'], stats['thr3v'], stats['booster'])

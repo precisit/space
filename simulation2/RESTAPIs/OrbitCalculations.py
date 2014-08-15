@@ -67,6 +67,12 @@ def GetEccentricity(pos, vel):
 	apoapsis = np.linalg.norm(np.max(apsides))
 	return (apoapsis-periapsis)/(apoapsis+periapsis)
 
+def GetVelocityInOrbit(pos, vel, targetAltitude):
+	apsides = ApsisCalculation(pos, vel)
+	semiMajorAxis = (np.linalg.norm(apsides[0])+np.linalg.norm(apsides[1]))/2
+	print 2./(targetAltitude+Re), 1./semiMajorAxis
+	return np.sqrt(consts.G*Me*(2./(targetAltitude)-1./semiMajorAxis))
+
 def TimeToApoapsis(pos, vel):
 	""" Calculates the time it will take to reach apoapsis for the vehicle """
 	apsides = ApsisCalculation(pos, vel)
@@ -92,17 +98,17 @@ def TimeToApoapsis(pos, vel):
 def CalculateBurnTime(rocket, deltaV):
 	""" Calculates how much the rocket will have to perform a burn to increase the deltaV """
 
-	return (rocket.mcurr/rocket.mdot)*(1-np.exp(-deltaV/(rocket.isp*consts.g)))
+	return (rocket.mcurr/rocket.mdotsave)*(1-np.exp(-deltaV/(rocket.isp*consts.g)))
 
 def FlightPathAngle(rocket, altitude):
 	""" Calculates and return the recommended flight path angle according
 	to MechJeb """
-	turnShapeExponent = 0.3
+	turnShapeExponent = 0.27
 	turnEndAngle = 0
 
 	if altitude < rocket.nAlt: return 90
-	if altitude > self.turnEndAltitude: return turnEndAngle
-	return Clamp(90.-((float)(altitude-rocket.nAlt)/(rocket.targetAltitude-rocket.nAlt))**turnShapeExponent*(90.-turnEndAngle),0.0, 89.99)
+	if altitude > rocket.targetAltitude: return 0
+	return Clamp(90.-((float)(altitude-rocket.nAlt)/(rocket.targetAltitude+5000-rocket.nAlt))**turnShapeExponent*(90.-turnEndAngle),0.0, 89.99)
 	
 def Clamp(value, minimum, maximum):
 	return np.max(np.array([minimum, np.min( np.array([maximum, value]))]))

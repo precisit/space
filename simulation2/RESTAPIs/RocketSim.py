@@ -25,28 +25,25 @@ def RocketFunc(t, w, rocket):
 	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
 	rocket.MainController(t)
 
-	
-
 	thrust = rocket.thrustGravTurn(pos, vel, t, w[8])
-	#thrust = rocket.ThrustAlgorithm(rocket.AP, pos, vel)
 
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr 	# Delta-V
 	dT = np.linalg.norm(thrust)-w[8] 			# Thrust
-	dDrag = np.abs(dragForce-w[9])/rocket.mcurr # Draglosses 
+	dDrag = np.abs(dragForce-w[9])/rocket.mcurr # Draglosses
 
-
-	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
+	horizon = OC.GetHorizontalUnitVector(pos, vel)
+	horizonAng = OC.AngleBetweenVectors(horizon, thrust)
+	dGravdrag = (np.linalg.norm(GravityAcc))*np.sin(horizonAng) 
 	
 	dragUnit = atmofunc.unit(atmofunc.inertToSurfVel(vel,pos))
 
 	acc = (1/rocket.mcurr)*(-dragForce*dragUnit + thrust)+GravityAcc # Resulting acceleration for the rocket
 
-	#print np.linalg.norm(thrust/(consts.g*rocket.mcurr))
 	return [vel[0], acc[0],
 			vel[1], acc[1],
-			vel[2], acc[2], dm, dv, dT, dDrag]
+			vel[2], acc[2], dm, dv, dT, dDrag, dGravdrag]
 
 def GravAcc(pos):
 	""" Calculates the gravitational acceleration at the current position """
@@ -55,7 +52,7 @@ def GravAcc(pos):
 """
 Gor sa att pitchAlt, initialPitch och gmax satts i rocket-objektet
 """
-def RocketSimulator(rocket, longi, lat, alt, tmax, dt, optional):
+def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 	t_start = 0.0
 	t_final = tmax
 	delta_t = dt
@@ -71,7 +68,7 @@ def RocketSimulator(rocket, longi, lat, alt, tmax, dt, optional):
 	initVel = np.cross(We, initPos)							# Initial velocity vector
 
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-					 rocket.mcurr, 0, 5885.e3,0]
+					 rocket.mcurr, 0, rocket.thr1sl,0,0]
 
 	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
 	r.set_initial_value(initial_conds, t_start).set_f_params(rocket)
@@ -87,9 +84,9 @@ def RocketSimulator(rocket, longi, lat, alt, tmax, dt, optional):
 	pitchangle = np.array([0])
 	
 	if optional['draglosses']:
-		draglosses = np.zeros([1, numsteps])
+		draglosses = np.zeros((numsteps, 1))
 	if optional['gravlosses']:
-		print 'Gravlosses'
+		gravlosses = np.zeros((numsteps, 1))
 	if optional['thrust']:
 		thrust = np.zeros((numsteps,1))
 	if optional['drag']:
@@ -108,7 +105,7 @@ def RocketSimulator(rocket, longi, lat, alt, tmax, dt, optional):
 		if optional['draglosses']:
 			draglosses[i] = r.y[9]
 		if optional['gravlosses']:
-			print 'Gravlosses'
+			gravlosses[i] = r.y[10]
 		if optional['thrust']:
 			thrust[i] = r.y[8]
 		if optional['pitchangle']:
@@ -117,7 +114,7 @@ def RocketSimulator(rocket, longi, lat, alt, tmax, dt, optional):
 			drag[i] = r.y[9]
 		r.set_f_params(rocket)
 		i+=1
-	return pos.tolist(), vel.tolist(), t.tolist(), np.max(deltaV), draglosses, gravlosses, thrust.tolist(), drag.tolist(), pitchangle.tolist()
+	return pos.tolist(), vel.tolist(), t.tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust.tolist(), drag.tolist(), pitchangle.tolist()
 
 
 """
@@ -135,10 +132,9 @@ if __name__ == '__main__':
 	initVel = np.cross(We, initPos)							# Initial velocity vector
 
 	payload = 10000.
-	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-					 402000+90720+payload, 0, 5885.e3,0]
+	
 	t_start = 0.0
-	t_final = 4500
+	t_final = 20000
 	delta_t = 1
 	numsteps = np.floor((t_final-t_start)/delta_t)+1 	
 	t = np.zeros((numsteps,1))
@@ -148,7 +144,7 @@ if __name__ == '__main__':
 	Rocket initial conditions
 	"""
 	
-	R = RocketClass3stage.Rocket(payload, t[0], 10000, 2.4, 100, 200000,
+	R = RocketClass3stage.Rocket(payload, t[0], 14000, 3, 2.6, 200000,
 								402000., 16000., 3900., 320., 280., 5885.e3,
 								90720., 3200., 182., 345., 800e3)
 	
@@ -159,12 +155,13 @@ if __name__ == '__main__':
 						  	555000, 79600, 0, 275, 6.47e6, True) #Ariane 5
 	"""
 	"""
-	R = RocketClass3stageAP.Rocket(payload, t[0], 20000, 2.5, 5, 300000,
+	R = RocketClass3stage.Rocket(payload, t[0], 10000, 4, 5, 300000,
 							2286217, 135218, 0, 304, 265, 38703000,
 							490778, 39048, 0, 421, 5.17e6,
 							119900, 13300, 0, 421, 1.03e6, False)
 	"""
-	
+	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
+					 R.mw1+R.mw2+R.mw3+payload, 0, R.thr1sl,0,0]
 	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
 	r.set_initial_value(initial_conds, t_start).set_f_params(R)
 	
@@ -185,6 +182,7 @@ if __name__ == '__main__':
 	dragUnit = np.zeros((3,numsteps))
 	apsis = np.zeros((3,numsteps))
 	draglosses = np.zeros((numsteps,1))
+	gravlosses = np.zeros((numsteps,1))
 	i=0
 	while r.successful() and i < numsteps:
 		r.integrate(r.t + delta_t)
@@ -210,11 +208,15 @@ if __name__ == '__main__':
 		surfVelUnit[:,i] = atmofunc.unit(surfVel[:,i])
 		dragUnit[:,i] = (vel[:,i]-np.cross(We,pos[:,i]))/np.linalg.norm(vel[:,i]-np.cross(We,pos[:,i]))#atmofunc.surfToInertPos(-surfVelUnit[:,i],t[i])
 		draglosses[i] = r.y[9]
+		gravlosses[i] = r.y[10]
 		i+=1
 	
 	
 	print "Total delta-V",deltaV[len(deltaV)-1]
 	print "Draglosses: ", draglosses[len(draglosses)-1]
+	print "gravlosses: ", gravlosses[len(gravlosses)-1]
+	plt.plot(t,gravlosses)
+	plt.show()
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')

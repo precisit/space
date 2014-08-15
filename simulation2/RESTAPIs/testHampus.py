@@ -9,13 +9,13 @@ Re = RocketSim.Re
 
 startTime = timer.time()
 
-R = RocketClass3stage.CreateRocket({'type':'soyuz2b', 'payload':5500, 'gAlt':10000, 'gmax':100})
+R = RocketClass3stage.CreateRocket({'type':'falcon9', 'payload':10000, 'gAlt':10000, 'gmax':100, 'tAlt':200000})
 optional = {'draglosses':False,
 			'gravlosses':False,
 			'thrust':False,
 			'drag':False,
 			'pitchangle':False}
-data = RocketSim.RocketSimulator(R, 90, 0,200000, 10000,1, optional)
+data = RocketSim.RocketSimulator(R, 90, 45, 1000,1, optional)
 
 """Plotting 3D"""
 	
@@ -36,6 +36,8 @@ ax.set_ylabel('Y-axis')
 ax.set_zlabel('Z-axis')
 plt.show()
 
+print 'Delta-V: ', data[3]
+print 'Draglosses: ', data
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 circ = plt.Circle((0,0), radius=Re, color='b')
