@@ -8,16 +8,16 @@ Re = 6371000
 We = np.array([0,0,np.pi*2./(24*3600)])
 
 
-Ptck1 = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/Pressuretck1.pk1'))
-Ptck2 = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/Pressuretck2.pk1'))
+Ptck1 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Pressuretck1.pk1'))
+Ptck2 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Pressuretck2.pk1'))
 
-Denstck1 = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/Denstck1.pk1'))
-Denstck2 = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/Denstck2.pk1'))
+Denstck1 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Denstck1.pk1'))
+Denstck2 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Denstck2.pk1'))
 
-Ttck1 = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/Ttck1.pk1'))
-Ttck2 = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/Ttck2.pk1'))
+Ttck1 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Ttck1.pk1'))
+Ttck2 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Ttck2.pk1'))
 
-dragCoefftck = pickle.load(open('/home/hampus/Precisit/space/simulation2/RESTAPIs/dragCoefftck.pk1'))
+dragCoefftck = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/dragCoefftck.pk1'))
 
 def pressure(alt):
 	if (alt<84852):

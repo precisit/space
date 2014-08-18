@@ -1,5 +1,7 @@
 import numpy as np
 import scipy.constants as consts
+import atmofunc
+
 
 # Earth constants
 Me = 5.97219e24
@@ -110,5 +112,12 @@ def FlightPathAngle(rocket, altitude):
 	if altitude > rocket.targetAltitude: return 0
 	return Clamp(90.-((float)(altitude-rocket.nAlt)/(rocket.targetAltitude+5000-rocket.nAlt))**turnShapeExponent*(90.-turnEndAngle),0.0, 89.99)
 	
+def DownRangeDist(pos1,pos2,t):
+	posSurf1 = atmofunc.inertToSurfPos(pos1,t)
+	posSurf2 = atmofunc.inertToSurfPos(pos2,t)
+	theta = AngleBetweenVectors(posSurf1,posSurf2)
+	distance = theta*Re
+	return distance 
+
 def Clamp(value, minimum, maximum):
 	return np.max(np.array([minimum, np.min( np.array([maximum, value]))]))

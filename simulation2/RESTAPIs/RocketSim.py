@@ -82,7 +82,7 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 	gravlosses = 0
 	thrust = np.array([0])
 	drag = np.array([0])
-	pitchangle = np.array([0])
+	downrange = np.array([0])
 	
 	if optional['draglosses']:
 		draglosses = np.zeros((numsteps, 1))
@@ -92,8 +92,8 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 		thrust = np.zeros((numsteps,1))
 	if optional['drag']:
 		drag = np.zeros((3,numsteps))
-	if optional['pitchangle']:
-		print 'Pitchangle'
+	if optional['downrange']:
+		downrange = np.zeros((numsteps, 1))
 
 	i=0
 	while r.successful() and i < numsteps:
@@ -109,13 +109,13 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 			gravlosses[i] = r.y[10]
 		if optional['thrust']:
 			thrust[i] = r.y[8]
-		if optional['pitchangle']:
-			print 'Pitchangle'
+		if optional['downrange']:
+			downrange[i] = OC.DownRangeDist(pos[:,1], pos[i], t[i])
 		if optional['drag']:
 			drag[i] = r.y[9]
 		r.set_f_params(rocket)
 		i+=1
-	return pos.tolist(), vel.tolist(), t.tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust.tolist(), drag.tolist(), pitchangle.tolist()
+	return pos.tolist(), vel.tolist(), t.tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust.tolist(), drag.tolist(), downrange.tolist()
 
 
 """
