@@ -53,15 +53,13 @@ def dragCoefficient(v,alt):
 	return CD
 	
 	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
-def dragForce(vi,ri, A=113):
+def dragForce(vi,ri, A=10.5):
 	vr, alt = inertToSurf(vi,ri)
 	v = np.linalg.norm(vr)
 	CD = dragCoefficient(v,alt)
 	rho = density(alt)
 	FD = 0.5*A*CD*rho*v**2
 	return FD
-
-
 
 def inertToSurf(vi,ri):
 	vr = inertToSurfVel(vi,ri)

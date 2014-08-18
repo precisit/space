@@ -26,6 +26,7 @@ def RocketFunc(t, w, rocket):
 	rocket.MainController(t)
 
 	thrust = rocket.thrustGravTurn(pos, vel, t, w[8])
+	#thrust = rocket.ThrustAlgorithm(pos,vel)
 
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
@@ -131,10 +132,10 @@ if __name__ == '__main__':
 
 	initVel = np.cross(We, initPos)							# Initial velocity vector
 
-	payload = 10000.
+	payload = 18000.
 	
 	t_start = 0.0
-	t_final = 20000
+	t_final = 4000
 	delta_t = 1
 	numsteps = np.floor((t_final-t_start)/delta_t)+1 	
 	t = np.zeros((numsteps,1))
@@ -144,7 +145,7 @@ if __name__ == '__main__':
 	Rocket initial conditions
 	"""
 	
-	R = RocketClass3stage.Rocket(payload, t[0], 14000, 3, 2.6, 200000,
+	R = RocketClass3stage.Rocket(payload, t[0], 14000, 10, 2000, 200000,
 								402000., 16000., 3900., 320., 280., 5885.e3,
 								90720., 3200., 182., 345., 800e3)
 	
@@ -215,8 +216,7 @@ if __name__ == '__main__':
 	print "Total delta-V",deltaV[len(deltaV)-1]
 	print "Draglosses: ", draglosses[len(draglosses)-1]
 	print "gravlosses: ", gravlosses[len(gravlosses)-1]
-	plt.plot(t,gravlosses)
-	plt.show()
+	
 	fig = plt.figure()
 	ax = fig.add_subplot(1,1,1)
 	circ = plt.Circle((0,0), radius=Re, color='b')
