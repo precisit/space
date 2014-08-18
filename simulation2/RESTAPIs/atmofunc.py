@@ -74,7 +74,7 @@ def inertToSurfVel(vi,ri):
 	vr = vi - np.cross(We,ri)
 	return vr
 
-def inertToSurfPos(ri,t):
+def surfToInertPos(ri,t):
 	omega = np.linalg.norm(We)
 	Rot = np.array([[np.cos(-omega*t), -np.sin(-omega*t), 0], 
 					[np.sin(-omega*t), np.cos(-omega*t), 0],
@@ -82,7 +82,7 @@ def inertToSurfPos(ri,t):
 	rr = np.dot(ri,Rot)
 	return rr
 
-def surfToInertPos(rr,t):
+def inertToSurfPos(rr,t):
 	omega = np.linalg.norm(We)
 	Rot = np.array([[np.cos(omega*t), -np.sin(omega*t), 0], 
 					[np.sin(omega*t), np.cos(omega*t), 0],

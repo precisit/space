@@ -110,7 +110,8 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 		if optional['thrust']:
 			thrust[i] = r.y[8]
 		if optional['downrange']:
-			downrange[i] = OC.DownRangeDist(pos[:,1], pos[i], t[i])
+			if not i == 0:
+				downrange[i] = OC.DownRangeDist(pos[:,i-1], pos[:,i], t[i]) + downrange[i-1]
 		if optional['drag']:
 			drag[i] = r.y[9]
 		r.set_f_params(rocket)

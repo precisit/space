@@ -99,13 +99,13 @@ def RocketSimulator(param):
 
 	"""Optional params"""
 	if 'optional' not in param:
-		optional = {'draglosses':False, 'gravlosses':False, 'thrust':False, 'drag':False, 'pitchangle':False}
+		optional = {'draglosses':False, 'gravlosses':False, 'thrust':False, 'drag':False, 'downrange':False}
 	else:
 		optional = param['optional']
 		if 'draglosses' not in optional: optional['draglosses'] = False
 		if 'gravlosses' not in optional: optional['gravlosses'] = False
 		if 'drag' not in optional: optional['drag'] = False
-		if 'pitchangle' not in optional: optional['pitchangle'] = False
+		if 'downrange' not in optional: optional['downrange'] = False
 		if 'thrust' not in optional: optional['thrust'] = False
 
 
