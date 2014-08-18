@@ -16,11 +16,9 @@ var jsonObj = JSON.stringify(myNumbers);
 //$.post("/test", jsonObj, function( result ) {
 $.post("/deltaV", jsonObj, function( result ) {
 	//Detta exekveras nar svar har fatts
-
 	console.log('deltaV using standard values to process Tmix', result.dVtot); 
 	console.log('approximations', result.Approximations);
 	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-
 }, "json"); 
 
 
@@ -33,13 +31,10 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
 $.post("/atmoPressure", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('pressure', result.pressure); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('pressure', result.pressure); 
 	console.log('altitude', result.altitude);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+}, "json"); 
 
 
 
@@ -52,13 +47,13 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
 $.post("/atmoPressure", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('pressure', result.pressure); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('pressure', result.pressure); 
 	console.log('altitude', result.altitude);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+}, "json"); 
+
+
+
 
 var myNumbers = {
 	 alt0:10,
@@ -68,13 +63,12 @@ var myNumbers = {
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
 $.post("/atmoDensity", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('density', result.density); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('density', result.density); 
 	console.log('altitude', result.altitude);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+}, "json"); 
+
+
 
 
 var myNumbers = {
@@ -84,36 +78,26 @@ var myNumbers = {
 }
 
 var jsonObj = JSON.stringify(myNumbers);
-
-//$.post("/test", jsonObj, function( result ) {
 $.post("/atmoTemp", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('temperature', result.temperature); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('temperature', result.temperature); 
 	console.log('altitude', result.altitude);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+}, "json"); 
+
+
 
 
 var myNumbers = {
-	 alt:200000,
+	 tAlt:200000,
 	 lat:0
 }
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
 $.post("/rocketSim", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('position', result.position); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('position', result.position); 
 	console.log('velocity', result.velocity);
-	//console.log('time', result.time);
 	console.log('deltaV', result.deltaV);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
-
-
-
-
+}, "json"); 
 
 
 
@@ -122,81 +106,65 @@ $.post("/rocketSim", jsonObj, function( result ) {
 
 
 var myNumbers = {
-	 fuel : "loxker",
+
 	 Pe : 1,
 	 Pc : 125,
-	 fun : "OMR"
 }
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
-$.post("/combustionData", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
+$.post("/OMR/loxker", jsonObj, function( result ) {
+	console.log('OMR', result.OMR); 
+}, "json");
 
-	console.log('OMR', result.OMR); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-	console.log('fuel', result.fuel);
-	//console.log('time', result.time);
-	console.log('Pc', result.Pc);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+
 
 var myNumbers = {
-	 fuel : "loxker",
+
 	 Pe : 2.4,
 	 Pc : 125,
-	 fun : "GMW"
+
 }
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
-$.post("/combustionData", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
+$.post("/GMW/loxker", jsonObj, function( result ) {
+	console.log('GMW', result.GMW); 
+}, "json"); 
 
-	console.log('GMW', result.GMW); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-	console.log('fuel', result.fuel);
-	//console.log('time', result.time);
-	console.log('Pc', result.Pc);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
 
 var myNumbers = {
-	 fuel : "loxmeth",
+
 	 Pe : 2.8,
 	 Pc : 125,
-	 fun : "AFT"
+
 }
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
-$.post("/combustionData", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
+$.post("/AFT/loxmeth", jsonObj, function( result ) {
+	console.log('AFT', result.AFT); 
+}, "json"); 
 
-	console.log('AFT', result.AFT); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-	console.log('fuel', result.fuel);
-	//console.log('time', result.time);
-	console.log('Pc', result.Pc);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
 
 var myNumbers = {
-	 fuel : "loxmeth",
+
 	 Pe : 2.7,
 	 Pc : 125,
-	 fun : "SHR"
+
 }
 
 var jsonObj = JSON.stringify(myNumbers);
 
-//$.post("/test", jsonObj, function( result ) {
-$.post("/combustionData", jsonObj, function( result ) {
-	//Detta exekveras nar svar har fatts
-
-	console.log('SHR', result.SHR); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
-	console.log('fuel', result.fuel);
-	//console.log('time', result.time);
-	console.log('Pc', result.Pc);
-}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
-
+$.post("/SHR/loxmeth", jsonObj, function( result ) {
+	console.log('SHR', result.SHR); 
+}, "json"); 
 
 
 

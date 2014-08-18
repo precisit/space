@@ -44,33 +44,33 @@ OKMtck2lines = pickle.load(open('C:/Github/space/propellant/OK-M2lines.pk1'))
 
 def OMR(params):
 	if params["fuel"].lower() == 'loxker':
-		return OKRtck(params["Pc"],params["Pe"])
+		return OKRtck(params["Pc"],params["Pe"]).tolist()
 	elif params["fuel"].lower() == 'loxmeth':
-		return OMRtck(params["Pc"],params["Pe"])
+		return OMRtck(params["Pc"],params["Pe"]).tolist()
 	else:
 		return "fuel not found"
 
 def AFT(params):
 	if params["fuel"].lower() == 'loxker':
-		return OKTtck(params["Pc"],params["Pe"])
+		return OKTtck(params["Pc"],params["Pe"]).tolist()
 	elif params["fuel"].lower() == 'loxmeth':
-		return OMTtck(params["Pc"],params["Pe"])
+		return OMTtck(params["Pc"],params["Pe"]).tolist()
 	else:
 		return "fuel not found"
 
 def GMW(params):
 	if params["fuel"].lower() == 'loxker':
-		return OKMtck(params["Pc"],params["Pe"])
+		return OKMtck(params["Pc"],params["Pe"]).tolist()
 	elif params["fuel"].lower() == 'loxmeth':
-		return OMMtck(params["Pc"],params["Pe"])
+		return OMMtck(params["Pc"],params["Pe"]).tolist()
 	else:
 		return "fuel not found"
 
 def SHR(params):
 	if params["fuel"].lower() == 'loxker':
-		return OKKtck(params["Pc"],params["Pe"])
+		return OKKtck(params["Pc"],params["Pe"]).tolist()
 	elif params["fuel"].lower() == 'loxmeth':
-		return OMKtck(params["Pc"],params["Pe"])
+		return OMKtck(params["Pc"],params["Pe"]).tolist()
 	else:
 		return "fuel not found"
 

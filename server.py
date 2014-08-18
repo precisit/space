@@ -104,6 +104,7 @@ class AtmoTempHandler(tornado.web.RequestHandler):
         except KeyError, e:
             raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
         self.write(json.dumps(response))
+
 class RocketSimHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
@@ -117,7 +118,7 @@ class RocketSimHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
         self.write(json.dumps(response))
 
-class CombustionDataHandler(tornado.web.RequestHandler):
+class OMRloxkerHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
 
@@ -125,8 +126,106 @@ class CombustionDataHandler(tornado.web.RequestHandler):
         indata = json.loads(self.request.body)
         response = {}
         try:
-            response[indata["fun"]], response["Pc"], response["Pe"] = propellantfunc.combData(indata)
-            response["fuel"] = indata["fuel"]
+            indata["fuel"] = "loxker"
+            response["OMR"] = propellantfunc.OMR(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class AFTloxkerHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxker"
+            response["AFT"] = propellantfunc.AFT(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class GMWloxkerHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxker"
+            response["GMW"] = propellantfunc.GMW(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class SHRloxkerHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxker"
+            response["SHR"] = propellantfunc.SHR(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class OMRloxmethHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxmeth"
+            response["OMR"] = propellantfunc.OMR(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class AFTloxmethHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxmeth"
+            response["AFT"] = propellantfunc.AFT(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class GMWloxmethHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxmeth"
+            response["GMW"] = propellantfunc.GMW(indata)
+        except KeyError, e:
+            raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
+        self.write(json.dumps(response))
+
+class SHRloxmethHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
+
+    def post(self):
+        indata = json.loads(self.request.body)
+        response = {}
+        try:
+            indata["fuel"] = "loxmeth"
+            response["SHR"] = propellantfunc.SHR(indata)
         except KeyError, e:
             raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
         self.write(json.dumps(response))
@@ -141,7 +240,15 @@ application = tornado.web.Application([
     (r"/atmoDensity",AtmoDensityHandler),
     (r"/atmoTemp",AtmoTempHandler),
     (r"/rocketSim", RocketSimHandler),
-    (r"/combustionData", CombustionDataHandler)
+    (r"/OMR/loxker", OMRloxkerHandler),
+    (r"/AFT/loxker", AFTloxkerHandler),
+    (r"/GMW/loxker", GMWloxkerHandler),
+    (r"/SHR/loxker", SHRloxkerHandler),
+    (r"/OMR/loxmeth", OMRloxmethHandler),
+    (r"/AFT/loxmeth", AFTloxmethHandler),
+    (r"/GMW/loxmeth", GMWloxmethHandler),
+    (r"/SHR/loxmeth", SHRloxmethHandler)
+    
 
 ], autoreload=True)
 
