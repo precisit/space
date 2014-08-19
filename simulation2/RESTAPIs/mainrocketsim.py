@@ -70,10 +70,21 @@ def RocketSimulator(param):
 	else:
 		rocketparams['payload'] = 10000
 	if 'pitchAlt' in param:
-		rocketparams['gAlt'] = param['pitchalt']
+		rocketparams['gAlt'] = param['pitchAlt']
 	else:
 	 	rocketparams['gAlt'] = 10000
-
+	if 'gT' in param:
+		rocketparams['gT'] = param['gT']
+	else:
+	 	rocketparams['gT'] = 2.5
+	if 'initAng' in param:
+		rocketparams['initAng'] = param['initAng']
+	else:
+	 	rocketparams['initAng'] = 4
+	if 'gAng' in param:
+		rocketparams['gAng'] = param['gAng']
+	else:
+	 	rocketparams['gAng'] = 45
 	if 'gmax' in param:
 		rocketparams['gmax'] = param['gmax']
 	else:

@@ -9,10 +9,11 @@ Me = 5.97219e24
 We = np.array([0,0,2*np.pi/(24*60*60)])
 
 class Rocket:
-	def __init__(self, mp, t, nAlt, nT, alim, targetAltitude,
-				mw1, md1, mi1, isp1v, isp1sl, thr1sl,
+	def __init__(self, mp, t, nAlt, nT, nAng,initAng, alim, targetAltitude,
+				mw1, md1, mi1, isp1v, isp1sl, thr1sl, Aflow,
 				mw2=0, md2=0, mi2=0, isp2v=0, thr2v=0,
 				mw3=0, md3=0, mi3=0, isp3v=0, thr3v=0, booster=False):
+
 		self.t = t
 		self.stage1 = True
 		self.stage2 = True
@@ -26,6 +27,8 @@ class Rocket:
 		self.isp1sl = isp1sl
 		self.thr1sl = thr1sl
 
+		self.Aflow = Aflow
+		
 		self.mw2 = mw2
 		self.md2 = md2
 		self.mi2 = mi2
@@ -66,6 +69,8 @@ class Rocket:
 		self.nAlt = nAlt
 		self.targetAltitude=targetAltitude
 		self.nT = nT
+		self.nAng = np.radians(nAng)
+		self.initAng = np.radians(initAng)
 		self.nStartT = None
 
 		self.firstcall = True
@@ -162,7 +167,7 @@ class Rocket:
 		tangUnit = atmofunc.unit(tangent)
 		#apsis = OC.ApsisCalculation(pos,v)
 		if self.firstcall:
-			ThrUnit = atmofunc.unit(np.cos(np.radians(4))*posUnit + np.sin(np.radians(4))*vUnit)
+			ThrUnit = atmofunc.unit(np.cos(self.initAng)*posUnit + np.sin(self.initAng)*vUnit)
 			self.firstcall = False
 			self.initThrust = ThrUnit
 		elif (alt < self.nAlt):
@@ -172,7 +177,7 @@ class Rocket:
 			ThrUnit = gTurnUnit
 			#print "initiate nudge! time, alt",t,alt
 		elif (t - self.nStartT < self.nT):
-			ThrUnit = atmofunc.unit(np.cos(np.radians(45))*tangUnit + np.sin(np.radians(45))*gTurnUnit)
+			ThrUnit = atmofunc.unit(np.cos(self.nAng)*tangUnit + np.sin(self.nAng)*gTurnUnit)
 			#print "nudging!", np.linalg.norm(ThrUnit)
 		elif  (alt>self.targetAltitude):
 			ThrUnit = tangUnit
@@ -224,35 +229,35 @@ class Rocket:
 
 def CreateRocket(param):
 	if param['type'] == 'falcon9':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.6, param['gmax'], param['tAlt'],
-						402000., 16000., 3900., 320., 280., 5885.e3,
-						90720., 3200., 182., 345, 800e3, False)
+		rocket = Rocket(param['payload'], 0, param['gAlt'], param['gT'], param['gAng'], param['initAng'], param['gmax'], param['tAlt'],
+						402000., 16000., 3900., 320., 280., 5885.e3, 21.237, # Area med payload fairing
+						90720., 3200., 182., 345, 800e3 )
 	elif param['type'] == 'saturnv':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5, param['gmax'],param['tAlt'],
-							2286217, 135218, 0, 304, 265, 38703000,
-							490778, 39048, 0, 421, 5.17e6,
+		rocket = Rocket(param['payload'], 0, param['gAlt'], param['gT'], param['gAng'], param['initAng'], param['gmax'], param['tAlt'],
+							2286217, 135218, 0, 304, 265, 38703000, 113,
+							490778, 39048, 0, 421, 5.17e6, 
 							119900, 13300, 0, 421, 1.03e6, False)
 	elif param['type'] == 'ariane5':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],param['tAlt'],
-							170800, 1.27e4, 0, 430, 340, 1.1114e6,
-						   	1.25e4, 2.7e3,  0, 324, 2.24e4,
+		rocket = Rocket(param['payload'], 0, param['gAlt'], param['gT'], param['gAng'], param['initAng'], param['gmax'], param['tAlt'],
+							170800, 1.27e4, 0, 430, 340, 1.1114e6, 22.9, #Arean utan boosters
+						   	1.25e4, 2.7e3,  0, 324, 2.24e4, 
 						  	555000, 79600, 0, 275, 6.47e6, True)
 	elif param['type'] == 'soyuz2b':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 3,param['gmax'],param['tAlt'],
-							105400, 6875, 0, 311, 245, 9.99e5,
-						   	25200, 2355,  0, 359, 2.94e5,
+		rocket = Rocket(param['payload'], 0, param['gAlt'], param['gT'], param['gAng'], param['initAng'], param['gmax'], param['tAlt'],
+							105400, 6875, 0, 311, 245, 9.99e5, 22,	  # ungefar samma som falcon 9 med payload fairing
+						   	25200, 2355,  0, 359, 2.94e5, 
 						  	177600, 15240, 0, 310, 4084000, True)
 	elif param['type'] == 'atlasv':
-		rocket = Rocket(param['payload'], 0, param['gAlt'], 2.5,param['gmax'],param['tAlt'],
-							306914, 22461, 0, 338, 253, 4.1e6,
-						   	22825, 2026,  0, 451, 9.9e4,
+		rocket = Rocket(param['payload'], 0, param['gAlt'], param['gT'], param['gAng'], param['initAng'], param['gmax'], param['tAlt'],
+							306914, 22461, 0, 338, 253, 4.1e6, 11.4, 	  #Area utan boosters
+						   	22825, 2026,  0, 451, 9.9e4, 
 						  	81648, 8000, 0, 310, 2.54e6, True)
 	elif param['type'] == 'custom':
 		stats = {'mw2':0, 'md2':0, 'mi2':0, 'isp2v':0, 'thr2v':0, 'mw3':0, 'md3':0, 'mi3':0, 'isp3v':0, 'thr3v':0, 'booster':False}
 		stats.update(param['stats'])
 
-		rocket = Rocket(param['payload'], 	 param['gAlt'], 2.5, param['gmax'],param['tAlt'],
-						stats['mw1'], stats['md1'], stats['mi1'], stats['isp1v'], stats['isp1sl'], stats['thr1sl'],
+		rocket = Rocket(param['payload'], 0, param['gAlt'], param['gT'], param['gAng'], param['initAng'], param['gmax'], param['tAlt'],
+						stats['mw1'], stats['md1'], stats['mi1'], stats['isp1v'], stats['isp1sl'], stats['thr1sl'],stats['Aflow'],
 						stats['mw2'], stats['md2'], stats['mi2'], stats['isp2v'], stats['thr2v'],
 						stats['mw3'], stats['md3'], stats['mi3'], stats['isp3v'], stats['thr3v'], stats['booster'])
 	return rocket

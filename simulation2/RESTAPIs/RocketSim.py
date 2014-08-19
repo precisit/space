@@ -22,7 +22,7 @@ def RocketFunc(t, w, rocket):
 	vel = np.array([w[1], w[3], w[5]]) 			# Velocities
 	velUnit = atmofunc.unit(vel)				# Unit velocity vector
 
-	dragForce = atmofunc.dragForce(vel, pos)	# Drag force magnitude
+	dragForce = atmofunc.dragForce(vel, pos, rocket.Aflow)	# Drag force magnitude
 	rocket.MainController(t)
 
 	thrust = rocket.thrustGravTurn(pos, vel, t, w[8])
@@ -77,13 +77,14 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 	pos = np.zeros((3, numsteps))
 	vel = np.zeros((3, numsteps))
 	deltaV = np.zeros((numsteps,1))
+	mass = np.zeros((numsteps,1))
 
 	draglosses = 0
 	gravlosses = 0
 	thrust = np.array([0])
 	drag = np.array([0])
 	downrange = np.array([0])
-	
+
 	if optional['draglosses']:
 		draglosses = np.zeros((numsteps, 1))
 	if optional['gravlosses']:
@@ -102,6 +103,7 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 		pos[:,i] = np.array([r.y[0], r.y[2], r.y[4]])
 		vel[:,i] = np.array([r.y[1], r.y[3], r.y[5]])
 		deltaV[i] = r.y[7]
+		mass[i] = r.y[6]
 
 		if optional['draglosses']:
 			draglosses[i] = r.y[9]
@@ -116,7 +118,7 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 			drag[i] = r.y[9]
 		r.set_f_params(rocket)
 		i+=1
-	return pos.tolist(), vel.tolist(), t.tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust.tolist(), drag.tolist(), downrange.tolist()
+	return pos.tolist(), vel.tolist(), t.tolist(), mass.tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust.tolist(), drag.tolist(), downrange.tolist()
 
 
 """
@@ -133,7 +135,7 @@ if __name__ == '__main__':
 
 	initVel = np.cross(We, initPos)							# Initial velocity vector
 
-	payload = 18000.
+#	payload = 18000.
 	
 	t_start = 0.0
 	t_final = 4000
@@ -145,11 +147,15 @@ if __name__ == '__main__':
 	"""
 	Rocket initial conditions
 	"""
-	
-	R = RocketClass3stage.Rocket(payload, t[0], 14000, 10, 2000, 200000,
-								402000., 16000., 3900., 320., 280., 5885.e3,
-								90720., 3200., 182., 345., 800e3)
-	
+	R = RocketClass3stage.CreateRocket({'type':'saturnv', 'payload':10000, 'lat':0, 'tAlt':200000, 'gmax':1000,
+								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
+								'tmax':8000 , 'gAlt':20000, 'gT':10, 'initAng':4, 'gAng':45})
+	"""
+	R = RocketClass3stage.Rocket(10.e3, 0, 10.e3, 2.6, 500., 200e3,
+						402000., 16000., 3900., 320., 280., 5885.e3, 21.237,
+						90720., 3200., 182., 345, 800e3)
+		
+	"""
 	"""
 	R = RocketClass3stage.Rocket(payload, t[0], 2000000, 2.5,100,
 							1.79e5, 1.27e4, 0, 430, 340, 1.11e6,
@@ -163,7 +169,7 @@ if __name__ == '__main__':
 							119900, 13300, 0, 421, 1.03e6, False)
 	"""
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-					 R.mw1+R.mw2+R.mw3+payload, 0, R.thr1sl,0,0]
+					 R.mw1+R.mw2+R.mw3+R.mp, 0, R.thr1sl,0,0]
 	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
 	r.set_initial_value(initial_conds, t_start).set_f_params(R)
 	
@@ -250,7 +256,7 @@ if __name__ == '__main__':
 	plt.ylabel("speed [m/s]")
 
 	plt.subplot(4,1,4)
-	drymasstot = np.ones((numsteps,1))*(R.md3+R.mi3+payload)
+	drymasstot = np.ones((numsteps,1))*(R.md3+R.mi3+R.mp)
 	plt.plot(t,mass,t,drymasstot)
 	plt.ylabel("mass [kg]")
 	plt.xlabel("time [s]")
