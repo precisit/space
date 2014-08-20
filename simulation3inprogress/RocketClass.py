@@ -60,7 +60,6 @@ class Rocket:
 		else:
 			self.mfuelCurrent -= (t-self.t)*self.mdot*self.mflow
 			self.mcurr = self.mfuelCurrent+self.md2+self.mi2+self.mp
-				
 
 	def MainController(self, t):
 		if self.cutFuel:
@@ -91,7 +90,7 @@ class Rocket:
 		tangUnit = atmofunc.unit(tangent)
 		#apsis = OC.ApsisCalculation(pos,v)
 		if self.firstcall:
-			ThrUnit = np.cos(np.radians(4))*posUnit + np.sin(np.radians(4))*vUnit
+			ThrUnit = atmofunc.unit(np.cos(np.radians(4))*posUnit + np.sin(np.radians(4))*vUnit)
 			self.firstcall = False
 			self.initThrust = ThrUnit
 		elif (alt < self.nAlt):
@@ -109,7 +108,6 @@ class Rocket:
 				self.cutFuel = True
 				self.mdot = 0
 				#print "cutFuel"
-
 		else:
 			ThrUnit = gTurnUnit
 
@@ -130,3 +128,7 @@ class Rocket:
 			print "mflow",self.mflow
 
 
+def CreateRocket(param):
+	if param['type'] == 'falcon9':
+		rocket = Rocket(402000., 16000., 3900., 320., 280., 5885.e3, 90720., 3200., 182., 345., 800000., param['payload'], 0, param['gAlt'], 2.5, param['gmax'])
+	return rocket

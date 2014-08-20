@@ -8,16 +8,16 @@ Re = 6371000
 We = np.array([0,0,np.pi*2./(24*3600)])
 
 
-Ptck1 = pickle.load(open('Pressuretck1.pk1'))
-Ptck2 = pickle.load(open('Pressuretck2.pk1'))
+Ptck1 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Pressuretck1.pk1'))
+Ptck2 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Pressuretck2.pk1'))
 
-Denstck1 = pickle.load(open('Denstck1.pk1'))
-Denstck2 = pickle.load(open('Denstck2.pk1'))
+Denstck1 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Denstck1.pk1'))
+Denstck2 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Denstck2.pk1'))
 
-Ttck1 = pickle.load(open('Ttck1.pk1'))
-Ttck2 = pickle.load(open('Ttck2.pk1'))
+Ttck1 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Ttck1.pk1'))
+Ttck2 = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/Ttck2.pk1'))
 
-dragCoefftck = pickle.load(open('dragCoefftck.pk1'))
+dragCoefftck = pickle.load(open('C:/Github/space/simulation2/RESTAPIs/dragCoefftck.pk1'))
 
 def pressure(alt):
 	if (alt<84852):
@@ -53,7 +53,7 @@ def dragCoefficient(v,alt):
 	return CD
 	
 	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
-def dragForce(vi,ri, A=113):
+def dragForce(vi,ri, A):
 	vr, alt = inertToSurf(vi,ri)
 	v = np.linalg.norm(vr)
 	CD = dragCoefficient(v,alt)
@@ -61,13 +61,11 @@ def dragForce(vi,ri, A=113):
 	FD = 0.5*A*CD*rho*v**2
 	return FD
 
-
-
 def inertToSurf(vi,ri):
 	vr = inertToSurfVel(vi,ri)
 	alt = inertToAlt(ri)
 	return vr,alt
-
+	
 def inertToAlt(ri):
 	alt = np.linalg.norm(ri)-Re
 	return alt
@@ -76,7 +74,7 @@ def inertToSurfVel(vi,ri):
 	vr = vi - np.cross(We,ri)
 	return vr
 
-def inertToSurfPos(ri,t):
+def surfToInertPos(ri,t):
 	omega = np.linalg.norm(We)
 	Rot = np.array([[np.cos(-omega*t), -np.sin(-omega*t), 0], 
 					[np.sin(-omega*t), np.cos(-omega*t), 0],
@@ -84,7 +82,7 @@ def inertToSurfPos(ri,t):
 	rr = np.dot(ri,Rot)
 	return rr
 
-def surfToInertPos(rr,t):
+def inertToSurfPos(rr,t):
 	omega = np.linalg.norm(We)
 	Rot = np.array([[np.cos(omega*t), -np.sin(omega*t), 0], 
 					[np.sin(omega*t), np.cos(omega*t), 0],
@@ -100,9 +98,9 @@ def unit(vec):
 	return unit
 
 	# efficient thrust as a function of position and current massflow. Ae is the area of the nozzle exit.
-def thrustEff(Ispvac,Ae,r,mdot):
+def thrustEff(Ispvac,Ae,r,mdot, ispb=0, mdotb=0,Aeb=0):
 	alt = inertToAlt(r)
-	Teff = Ispvac*constants.g*mdot - Ae*pressure(alt)
+	Teff = Ispvac*constants.g*mdot+ispb*constants.g*mdotb- (Ae+Aeb)*pressure(alt)
 	if (Teff<0):
 		Teff=0
 	return Teff
@@ -169,3 +167,5 @@ if __name__=="__main__":
 	plt.plot(r[:,0],Thrust)
 	plt.title('Thrust')
 	plt.show()
+
+	print pressure(np.array([1,2,3,4,5,6]))
