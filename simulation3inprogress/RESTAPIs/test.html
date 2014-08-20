@@ -1,0 +1,125 @@
+<html><body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+Se "Developer Console" för resultat.
+<script>
+
+
+
+var myNumbers = {
+	alt:200000, lat:28, incl:28
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/deltaV", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('deltaV using standard values to process Tmix', result.dVtot); 
+	console.log('approximations', result.Approximations);
+	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+
+}, "json"); 
+
+
+
+
+
+var myNumbers = {
+	 alt:1
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoPressure", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('pressure', result.pressure); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoPressure", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('pressure', result.pressure); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoDensity", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('density', result.density); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/atmoTemp", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('temperature', result.temperature); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('altitude', result.altitude);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+var myNumbers = {
+	 alt:200000,
+	 lat:0
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/rocketSim", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+
+	console.log('position', result.position); //Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+	console.log('velocity', result.velocity);
+	//console.log('time', result.time);
+	console.log('deltaV', result.deltaV);
+}, "json"); //Denna fjarte parameter till $.post() auto-decodar JSON sa man slipper gora det sjalv
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html> 
+

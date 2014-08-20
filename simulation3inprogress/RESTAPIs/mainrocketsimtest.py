@@ -5,15 +5,20 @@ import numpy as np
 import time as timer
 
 Re = 6371000.
-param = {'rocket':'falcon9', 'payload':10000, 'lat':0, 'tAlt':150000, 'gmax':1000,
+param = {'rocket':'ariane5', 'payload':10000, 'lat':0, 'tAlt':150000, 'gmax':999,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
-								'pitchAlt':10000, 'gT':2.5, 'initAng':4, 'gAng':45,
+								'pitchAlt':10000, 'pitchT':2.5, 'initAng':4, 'pitchAng':45,
 								'tmax':8000,'dt':0.5}
-param1 = {'rocket':'custom', 'payload':10000, 'lat':0, 'longi':213 ,'tAlt':200000, 'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True}}
+param1 = {'rocket':'custom', 'payload':10000, 'lat':0, 'tAlt':150000000, 'gmax':999,
+								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
+								'pitchAlt':12000, 'pitchT':1, 'initAng':0, 'pitchAng':45,
+								'tmax':20000,'dt':0.5}
+
+param1['stats'] = {'mw1':100000, 'md1':1, 'mi1':1, 'isp1v':500, 'isp1sl':490, 'thr1sl':9999e3, 
+					'mw2':10000, 'md2':1, 'mi2':1, 'isp2v':700, 'thr2v':999e3,'Aflow':10}
 param2 = {'rocket':'saturnV', 'payload':40000, 'lat':0, 'longi':45, 'tAlt':400000}
-param1['stats'] = {'mw1':100000, 'md1':10000, 'mi1':500, 'isp1v':320, 'isp1sl':300, 'thr1sl':2000000}
 startComp = timer.time()
-data=mr.RocketSimulator(param)
+data=mr.RocketSimulator(param1)
 print "time to compute", timer.time() - startComp 
 
 
