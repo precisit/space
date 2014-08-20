@@ -32,7 +32,7 @@ def RocketFunc(t, w, rocket):
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr 	# Delta-V
 	dT = np.linalg.norm(thrust)-w[8] 			# Thrust
-	dDrag = np.abs(dragForce-w[9])/rocket.mcurr # Draglosses
+	dDrag = np.linalg.norm(dragForce)-w[9]#/rocket.mcurr # Draglosses
 
 	horizon = OC.GetHorizontalUnitVector(pos, vel)
 	horizonAng = OC.AngleBetweenVectors(horizon, thrust)
@@ -92,7 +92,7 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 	if optional['thrust']:
 		thrust = np.zeros((numsteps,1))
 	if optional['drag']:
-		drag = np.zeros((3,numsteps))
+		drag = np.zeros((numsteps,1))
 	if optional['downrange']:
 		downrange = np.zeros((numsteps, 1))
 
@@ -105,8 +105,8 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 		deltaV[i] = r.y[7]
 		mass[i] = r.y[6]
 
-		if optional['draglosses']:
-			draglosses[i] = r.y[9]
+		if optional['draglosses'] and not i == 0:
+			draglosses[i] = draglosses[i-1] + delta_t*(r.y[9]+drag[i-1])/(r.y[6]+mass[i-1]) 
 		if optional['gravlosses']:
 			gravlosses[i] = r.y[10]
 		if optional['thrust']:

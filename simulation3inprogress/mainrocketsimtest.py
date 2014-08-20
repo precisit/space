@@ -5,10 +5,10 @@ import numpy as np
 import time as timer
 
 Re = 6371000.
-param = {'rocket':'ariane5', 'payload':10000, 'lat':0, 'tAlt':150000, 'gmax':999,
-								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
-								'pitchAlt':10000, 'pitchT':2.5, 'initAng':4, 'pitchAng':45,
-								'tmax':8000,'dt':0.5}
+param = {'rocket':'falcon9', 'payload':17000, 'lat':0, 'tAlt':150000, 'gmax':5,
+								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True, 'drag':True}, 
+								'pitchAlt':10000, 'pitchT':1, 'initAng':5, 'pitchAng':45,
+								'tmax':8000,'dt':1}
 param1 = {'rocket':'custom', 'payload':10000, 'lat':0, 'tAlt':150000000, 'gmax':999,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
 								'pitchAlt':12000, 'pitchT':1, 'initAng':0, 'pitchAng':45,
@@ -18,7 +18,7 @@ param1['stats'] = {'mw1':100000, 'md1':1, 'mi1':1, 'isp1v':500, 'isp1sl':490, 't
 					'mw2':10000, 'md2':1, 'mi2':1, 'isp2v':700, 'thr2v':999e3,'Aflow':10}
 param2 = {'rocket':'saturnV', 'payload':40000, 'lat':0, 'longi':45, 'tAlt':400000}
 startComp = timer.time()
-data=mr.RocketSimulator(param1)
+data=mr.RocketSimulator(param)
 print "time to compute", timer.time() - startComp 
 
 
@@ -28,6 +28,7 @@ t = time = np.array(data[2])
 mass = np.array(data[3])
 thrust = np.array(data[7])
 drag = np.array(data[8])
+print drag
 downrange = data[9]
 
 numsteps = len(data[2])
@@ -79,7 +80,7 @@ plt.plot(t,apsis[2]-Re)
 plt.ylabel("orthdist-Re [m]")
 plt.show()
 """
-plt.subplot(2,1,1)
+plt.subplot(3,1,1)
 plt.plot(t, thrust)
 plt.ylabel("thrust [N]")
 """
@@ -88,11 +89,15 @@ plt.plot(t,deltaV)
 plt.ylabel("applied deltaV [m/s]")
 plt.xlabel("time [s]")
 """
+plt.subplot(3,1,2)
+plt.plot(t, drag)
+plt.ylabel("drag [N]")
 
+plt.subplot(3,1,3)
+plt.plot(t, (thrust-drag)/(mass*9.81))
+plt.ylabel("G-force by thrust and drag")
 plt.show()
 """
-plt.plot(t, thrust/(mass*consts.g))
-plt.show()
 plt.plot(t, draglosses)
 plt.ylabel("Draglosses ")
 plt.xlabel("time [s]")
