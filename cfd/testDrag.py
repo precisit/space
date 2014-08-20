@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+sys.path.append('C:/Github/space/simulation2/RESTAPIs')
 import atmofunc
 n = 500
 v = np.zeros((3,n))
@@ -16,13 +18,15 @@ for i in range(n):
 	dragForce[i] = atmofunc.dragForce(v[:,i],pos[:,i],A=21.24)
 
 
-vabsmeas = np.array([10,95,100])
-CDmeas = np.array([0.29,0.53,0.36])
-dragForcemeas = np.array([365., np.NaN, 45450])
+vabsmeas = np.array([10,50,75,100,150])
+CDmeas = np.array([0.34,0.34,0.33,0.33,0.33])
+dragForcemeas = np.array([424., 10628, 23860, 41631,95507])
 plt.plot(vAbs,CD)
+plt.title('dragCoefficient')
 plt.plot(vabsmeas,CDmeas,'r+')
 plt.show()
 plt.plot(vabsmeas,dragForcemeas,'r+')
 plt.plot(vAbs,dragForce)
+plt.title('dragForce')
 plt.show()
 
