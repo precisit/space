@@ -111,14 +111,15 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 			gravlosses[i] = r.y[10]
 		if optional['thrust']:
 			thrust[i] = r.y[8]
-		if optional['downrange']:
-			if not i == 0:
-				downrange[i] = OC.DownRangeDist(pos[:,i-1], pos[:,i], t[i]) + downrange[i-1]
+		if optional['downrange'] and not i == 0:
+			downrange[i] = OC.DownRangeDist(pos[:,i-1], pos[:,i], t[i]) + downrange[i-1]
 		if optional['drag']:
 			drag[i] = r.y[9]
 		r.set_f_params(rocket)
+		if np.linalg.norm(pos[:,i])-Re<-1: 
+			break
 		i+=1
-	return pos.tolist(), vel.tolist(), t.tolist(), mass.tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust.tolist(), drag.tolist(), downrange.tolist()
+	return pos[:,:i].tolist(), vel[:,:i].tolist(), t[:i].tolist(), mass[:i].tolist(), np.max(deltaV), np.max(draglosses), np.max(gravlosses), thrust[:i].tolist(), drag[:i].tolist(), downrange[:i].tolist()
 
 
 """

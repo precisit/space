@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import atmofunc
 import numpy as np
 Re = 6371000.
-param = {'rocket':'ariane5', 'payload':1000, 'lat':0, 'tAlt':200000, 'gmax':1000,
+param = {'rocket':'falcon9', 'payload':10000, 'lat':0, 'tAlt':150000, 'gmax':1000,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
-								'pitchAlt':10000000, 'gT':0, 'initAng':0, 'gAng':45,
+								'pitchAlt':10000, 'gT':2.5, 'initAng':4, 'gAng':45,
 								'tmax':8000,'dt':0.5}
 param1 = {'rocket':'custom', 'payload':10000, 'lat':0, 'longi':213 ,'tAlt':200000, 'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True}}
 param2 = {'rocket':'saturnV', 'payload':40000, 'lat':0, 'longi':45, 'tAlt':400000}
