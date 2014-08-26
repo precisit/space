@@ -2,22 +2,22 @@ import numpy as np
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import pickle
-import math
 import scipy.constants as constants
 
 Re = 6371000
-omega = np.array([0,0,math.pi*2./(24*3600)])
+We = np.array([0,0,np.pi*2./(24*3600)])
 
-Ptck1 = pickle.load(open('Pressuretck1.pk1'))
-Ptck2 = pickle.load(open('Pressuretck2.pk1'))
 
-Denstck1 = pickle.load(open('Denstck1.pk1'))
-Denstck2 = pickle.load(open('Denstck2.pk1'))
+Ptck1 = pickle.load(open('C:/Github/space/simulation/Pressuretck1.pk1'))
+Ptck2 = pickle.load(open('C:/Github/space/simulation/Pressuretck2.pk1'))
 
-Ttck1 = pickle.load(open('Ttck1.pk1'))
-Ttck2 = pickle.load(open('Ttck2.pk1'))
+Denstck1 = pickle.load(open('C:/Github/space/simulation/Denstck1.pk1'))
+Denstck2 = pickle.load(open('C:/Github/space/simulation/Denstck2.pk1'))
 
-dragCoefftck = pickle.load(open('dragCoefftck.pk1'))
+Ttck1 = pickle.load(open('C:/Github/space/simulation/Ttck1.pk1'))
+Ttck2 = pickle.load(open('C:/Github/space/simulation/Ttck2.pk1'))
+
+dragCoefftck = pickle.load(open('C:/Github/space/simulation/dragCoefftck.pk1'))
 
 def pressure(alt):
 	if (alt<84852):
@@ -48,12 +48,12 @@ def temp(alt):
 		P=1011.5379
 	return P
 def dragCoefficient(v,alt):
-	mach = v/(20.0457*math.sqrt(temp(alt)))
+	mach = v/(20.0457*np.sqrt(temp(alt)))
 	CD = interpolate.splev(mach,dragCoefftck)
 	return CD
 	
 	#  "A is the area of the body normal to the flow". The saturn V has an area of 113 m^2 
-def dragForce(vi,ri,A=113):
+def dragForce(vi,ri, A):
 	vr, alt = inertToSurf(vi,ri)
 	v = np.linalg.norm(vr)
 	CD = dragCoefficient(v,alt)
@@ -61,26 +61,48 @@ def dragForce(vi,ri,A=113):
 	FD = 0.5*A*CD*rho*v**2
 	return FD
 
-
-
 def inertToSurf(vi,ri):
 	vr = inertToSurfVel(vi,ri)
 	alt = inertToAlt(ri)
 	return vr,alt
-
+	
 def inertToAlt(ri):
 	alt = np.linalg.norm(ri)-Re
 	return alt
 
 def inertToSurfVel(vi,ri):
-	vr = vi-np.cross(omega,ri)
+	vr = vi - np.cross(We,ri)
 	return vr
 
+def surfToInertPos(ri,t):
+	omega = np.linalg.norm(We)
+	Rot = np.array([[np.cos(-omega*t), -np.sin(-omega*t), 0], 
+					[np.sin(-omega*t), np.cos(-omega*t), 0],
+					[0, 0, 1]])
+	rr = np.dot(ri,Rot)
+	return rr
+
+def inertToSurfPos(rr,t):
+	omega = np.linalg.norm(We)
+	Rot = np.array([[np.cos(omega*t), -np.sin(omega*t), 0], 
+					[np.sin(omega*t), np.cos(omega*t), 0],
+					[0, 0, 1]])
+	ri = np.dot(rr,Rot)
+	return ri
+def unit(vec):
+	norm = np.linalg.norm(vec)
+	if norm == 0:
+		unit = np.array([0,0,0])
+	else:
+		unit = vec/norm
+	return unit
 
 	# efficient thrust as a function of position and current massflow. Ae is the area of the nozzle exit.
-def thrustEff(Ispvac,Ae,r,mdot):
+def thrustEff(Ispvac,Ae,r,mdot, ispb=0, mdotb=0,Aeb=0):
 	alt = inertToAlt(r)
-	Teff = Ispvac*constants.g*mdot - Ae*pressure(alt)
+	Teff = Ispvac*constants.g*mdot+ispb*constants.g*mdotb- (Ae+Aeb)*pressure(alt)
+	if (Teff<0):
+		Teff=0
 	return Teff
 
 def Ae(Ispvac,mdotmax,FSL):
@@ -118,7 +140,7 @@ if __name__=="__main__":
 		T[i] = temp(alt[i])
 		#CD[i] = dragCoefficient(v[i],alt[i])
 		
-		FD[i] = dragForce(v[i,:],r[i,:])
+		FD[i] = dragForce(v[i,:],r[i,:],113)
 		Thrust[i] = thrustEff(320,Ae,r[i,:],236.047)
 		
 		
@@ -145,3 +167,5 @@ if __name__=="__main__":
 	plt.plot(r[:,0],Thrust)
 	plt.title('Thrust')
 	plt.show()
+
+	print pressure(np.array([1,2,3,4,5,6]))
