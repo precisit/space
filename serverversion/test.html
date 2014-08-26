@@ -1,0 +1,179 @@
+<html><body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+Se "Developer Console" för resultat.
+<script>
+
+
+
+var myNumbers = {
+	alt:200000, lat:28, incl:28
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+//$.post("/test", jsonObj, function( result ) {
+$.post("/deltaV", jsonObj, function( result ) {
+	//Detta exekveras nar svar har fatts
+	console.log('deltaV using standard values to process Tmix', result.dVtot); 
+	console.log('approximations', result.Approximations);
+	//Skriv ut summan i dev console (Chrome->View->Developer->Developer Tools)
+}, "json"); 
+
+
+
+
+
+var myNumbers = {
+	 alt:1
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/atmoPressure", jsonObj, function( result ) {
+	console.log('pressure', result.pressure); 
+	console.log('altitude', result.altitude);
+}, "json"); 
+
+
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/atmoPressure", jsonObj, function( result ) {
+	console.log('pressure', result.pressure); 
+	console.log('altitude', result.altitude);
+}, "json"); 
+
+
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/atmoDensity", jsonObj, function( result ) {
+	console.log('density', result.density); 
+	console.log('altitude', result.altitude);
+}, "json"); 
+
+
+
+
+var myNumbers = {
+	 alt0:10,
+	 alt1:1000,
+	 res:30
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+$.post("/atmoTemp", jsonObj, function( result ) {
+	console.log('temperature', result.temperature); 
+	console.log('altitude', result.altitude);
+}, "json"); 
+
+
+
+
+var myNumbers = {
+	 tAlt:200000,
+	 lat:0
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/rocketSim", jsonObj, function( result ) {
+	console.log('position', result.position); 
+	console.log('velocity', result.velocity);
+	console.log('deltaV', result.deltaV);
+}, "json"); 
+
+
+
+
+
+
+
+var myNumbers = {
+
+	 Pe : 1,
+	 Pc : 125,
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/OMR/loxker", jsonObj, function( result ) {
+	console.log('OMR', result.OMR); 
+}, "json");
+
+
+
+
+
+var myNumbers = {
+
+	 Pe : 2.4,
+	 Pc : 125,
+
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/GMW/loxker", jsonObj, function( result ) {
+	console.log('GMW', result.GMW); 
+}, "json"); 
+
+
+
+
+var myNumbers = {
+
+	 Pe : 2.8,
+	 Pc : 125,
+
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/AFT/loxmeth", jsonObj, function( result ) {
+	console.log('AFT', result.AFT); 
+}, "json"); 
+
+
+
+
+var myNumbers = {
+
+	 Pe : 2.7,
+	 Pc : 125,
+
+}
+
+var jsonObj = JSON.stringify(myNumbers);
+
+$.post("/SHR/loxmeth", jsonObj, function( result ) {
+	console.log('SHR', result.SHR); 
+}, "json"); 
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html> 
+
