@@ -1,11 +1,11 @@
 import numpy as np
 from scipy import integrate
 import atmofunc
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy.constants as consts
 import RocketClass3stage
 import OrbitCalculations as OC
-import time as timer
+#import time as timer
 import ascTime
 # Earth constants
 Me = 5.97219e24

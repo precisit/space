@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import scipy.constants as consts
 import RocketClass
 import OrbitCalculations as OC
-import time as timer
+#import time as timer
 import RocketSim
 import warnings
 Re = 6371000.

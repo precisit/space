@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import interpolate
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import pickle
 """
 this is a script that takes the numerical values of the www.braeunig.us/space/amos.html ,

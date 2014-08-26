@@ -40,7 +40,7 @@ OMMtck = pickle.load(open('/home/hans-erik/space/propellant/OM-M.pk1'))
 OMTtck = pickle.load(open('/home/hans-erik/space/propellant/OM-T.pk1'))
 OMKtck = pickle.load(open('/home/hans-erik/space/propellant/OM-K.pk1'))
 
-OKMtck2lines = pickle.load(open('C:/Github/space/propellant/OK-M2lines.pk1'))
+OKMtck2lines = pickle.load(open('/home/hans-erik/space/propellant/OK-M2lines.pk1'))
 
 def OMR(params):
 	if params["fuel"].lower() == 'loxker':

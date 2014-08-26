@@ -1,5 +1,5 @@
 import mainrocketsim as mr
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import atmofunc
 import numpy as np
 import time as timer
