@@ -1,17 +1,101 @@
 <!DOCTYPE html>
 <html>
 <body>
+<hr>
 <h1>User manual</h1>
 <hr>
 
 
 <h2>labs.simulations.io/deltaV</h2>
 
-<p>This API calculates the amount of delta-V required to insert a spacecraft
-into a specified orbit using Schillings method.</p>
+	<p>This API calculates the amount of delta-V required to insert a spacecraft
+	into a specified orbit using Schillings method.</p>
 
-<p style="font-family:Lucida console;">atmofunc.OMR({afdsaf}) <br>
-										atmofunc.OMR(fdsafdsa)
-</p>
+	<p style="font-family:Lucida console;">
+	$ curl --data '{"alt":200000, "lat":28}' http://labs.simulations.io/deltaV 
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"dVtot": 9245.707235076003, <br>
+	"Approximations": {"deltaV to parking orbit": 9288.23360759843, "stage separation time": 0, "Isp for stage 1 in vaacum": 320, "Acceleration at sealevel": 11.8, "Ascent time Tmix, approximated to T3s": 500.0712257284257, "inclination": 28}}
+	</p>
+	<br>
+
+
+<h2>labs.simulations.io/Tmix</h2>
+
+	<p>This API calculates Tmix as described in Schillings paper.</p>
+
+	<p style="font-family:Lucida console;">
+	$ curl --data '{"mb1":386000, "Isp1SL":282, "T1":5885000, "mb2":87000, "Isp2V":345, "T2":800000}' http://labs.simulations.io/Tmix
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"Tmix": 516.3851378224726, <br>
+	"Approximations": {"Acceleration at sealevel": 11.8, "deltaV to parking orbit": 9300, "stage separation time": 0, "Isp for stage 1 in vaacum": 310.20000000000005, "Ascent time Tmix calculated to": 516.3851378224726}}
+	</p>
+	<br>
+
+<h2>labs.simulations.io/rocketCapability</h2>
+
+	<p>This API calculates the maximum payload to a specified orbit using Schillings method and the rocket equation.</p>
+
+	<p style="font-family:Lucida console;">
+	$ curl --data '{"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885000, "mw2":90720, "md2":3200,"mr2":182,"Isp2V":345, "T2":800e3, "alt":200000,"lat":28, "incl":28}' http://labs.simulations.io/rocketCapability
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"Approximations": {"stage separation time": 0},<br>
+	"mp": 19919.042250353956}
+	</p>
+	<br>
+<h2>labs.simulations.io/atmoPressure -- /atmoTemp -- /atmoDensity </h2>
+
+	<p>These APIs returns the pressure, temperature or density at given altitudes according to the model taken from braeunig.us .</p>
+
+	<p style="font-family:Lucida console;">
+	curl --data '{"alt":10000}' http://labs.simulations.io/atmoPressure
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"pressure": 26436.300000000003, "altitude": 10000}
+	</p>
+
+	<p>and:</p> 
+
+	<p style="font-family:Lucida console;">
+	$ curl --data '{"alt0":10000, "alt1":20e3, "res":5}' http://labs.simulations.io/atmoPressure
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"pressure": [26436.300000000003, 17859.817129950592, 12044.599999999999, 8109.9290101863035, 5474.890000000001], <br>
+	"altitude": [10000.0, 12500.0, 15000.0, 17500.0, 20000.0]}
+	</p>
+	<br>
+
+<h2>labs.simulations.io/rocketSim</h2>
+
+	<p>This API does a simulated rocket launch and returns a number of values depending on what the user specified</p>
+
+	<p style="font-family:Lucida console;">
+	curl --data '{"alt":10000}' http://labs.simulations.io/atmoPressure
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"pressure": 26436.300000000003, "altitude": 10000}
+	</p>
+
+	<p>and:</p> 
+
+	<p style="font-family:Lucida console;">
+	$ curl --data '{"alt0":10000, "alt1":20e3, "res":5}' http://labs.simulations.io/atmoPressure
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;">
+	{"pressure": [26436.300000000003, 17859.817129950592, 12044.599999999999, 8109.9290101863035, 5474.890000000001], <br>
+	"altitude": [10000.0, 12500.0, 15000.0, 17500.0, 20000.0]}
+	</p>
+	<br>
+
 </body>
 </html>

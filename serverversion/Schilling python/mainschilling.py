@@ -96,8 +96,8 @@ def Tmix(rockPar):
 def mpSolver(mpsolvePar):
 	approximations = {}
 	if ("ssT" not in mpsolvePar):
-		mpsolvePar["sst"] = 0
-		approximations["stage separation time"] = rockPar["ssT"]
+		mpsolvePar["ssT"] = 0
+		approximations["stage separation time"] = mpsolvePar["ssT"]
 	
 	mp = mpsolver.mpSolve(mpsolvePar["mw1"], mpsolvePar["md1"], mpsolvePar["mr1"], mpsolvePar["Isp1SL"], 
 		mpsolvePar["Isp1V"], mpsolvePar["T1"], mpsolvePar["mw2"], mpsolvePar["md2"], mpsolvePar["mr2"], 

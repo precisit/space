@@ -25,6 +25,10 @@ class TestjsHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('test.html')
 
+class UserManualHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('user_manual.html')
+
 class DeltaVHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*") #allow requests from other domains than self
@@ -247,7 +251,8 @@ application = tornado.web.Application([
     (r"/OMR/loxmeth", OMRloxmethHandler),
     (r"/AFT/loxmeth", AFTloxmethHandler),
     (r"/GMW/loxmeth", GMWloxmethHandler),
-    (r"/SHR/loxmeth", SHRloxmethHandler)
+    (r"/SHR/loxmeth", SHRloxmethHandler),
+    (r"/userManual", UserManualHandler)
     
 
 ], autoreload=True)
