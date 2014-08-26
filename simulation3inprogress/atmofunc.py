@@ -140,7 +140,7 @@ if __name__=="__main__":
 		T[i] = temp(alt[i])
 		#CD[i] = dragCoefficient(v[i],alt[i])
 		
-		FD[i] = dragForce(v[i,:],r[i,:])
+		FD[i] = dragForce(v[i,:],r[i,:],113)
 		Thrust[i] = thrustEff(320,Ae,r[i,:],236.047)
 		
 		

@@ -36,49 +36,49 @@ def Tmix(rockPar):
 	if ("mb1" not in rockPar):
 		if("mw1" not in rockPar or "md1" not in rockPar or "mr1" not in rockPar):
 			gotMb = False
-			print "noMb"
+			
 		else:
 			rockPar["mb1"] = rockPar["mw1"]-rockPar["md1"]-rockPar["mr1"]
-			print "mb calculated by mw osv....", rockPar["mb1"]
+			
 
 	if ("mb2" not in rockPar):
 		if("mw2" not in rockPar or "md2" not in rockPar or "mr2" not in rockPar):
 			gotMb = False
-			print "noMb"
+			
 		else:
 			rockPar["mb2"] = rockPar["mw2"]-rockPar["md2"]-rockPar["mr2"]
-			print "mb calculated by mw osv....", rockPar["mb2"]
+			
 
 	
 	if ("mw1" not in rockPar or "mw2" not in rockPar or "mp" not in rockPar):
 		rockPar["A0"] = 11.8
 		approximations["Acceleration at sealevel"] = rockPar["A0"]
-		print "A0=11"
+		
 	else:
 		rockPar["A0"] = rockPar["T1"]/(rockPar["mw1"] + rockPar["mw2"] + rockPar["mp"])
-		print "A0 calculated by T1 mw1 osv", rockPar["A0"]
+		
 	
 	if ("deltaVp" not in rockPar):
 		if ("alt" not in rockPar): 
 			rockPar["deltaVp"] = 9300
-			print "deltaVp = 9300"
+			
 		else:
 			rockPar["deltaVp"] = schilling.Vcirc(rockPar["alt"]) + 1500
-			print "deltaVp = Vcirc(alt) + 1500", rockPar["deltaVp"]
+			
 		approximations["deltaV to parking orbit"] = rockPar["deltaVp"]
 	
 	if ("ssT" not in rockPar):
 		rockPar["ssT"] = 0
 		approximations["stage separation time"] = rockPar["ssT"]
-		print "ssT = 0"
+		
 
 	if ("Isp1V" not in rockPar):
 		if ("Isp1SL" not in rockPar):
 			rockPar["Isp1V"] = 320
-			print "Isp1V = 320"
+			
 		else:
 			rockPar["Isp1V"] = 1.1*rockPar["Isp1SL"]
-			print "Isp1V = 1.1*Isp1SL", 
+			 
 		approximations["Isp for stage 1 in vaacum"] = rockPar["Isp1V"]
 
 	if (gotMb):
@@ -89,7 +89,6 @@ def Tmix(rockPar):
 
 	else:
 		Tmix = ascTime.T3s(rockPar["deltaVp"],rockPar["Isp1V"],rockPar["A0"])
-		print "Tmix approximated to T3s", Tmix
 		approximations["Ascent time Tmix, approximated to T3s"] = Tmix
 	return Tmix, approximations
 
