@@ -31,14 +31,14 @@ Pe = [2.2, 2.4]
 and for liquid oxygen and methane:
 Pe = [2.7, 2.9]
 """
-OKRtck = pickle.load(open('C:/Github/space/propellant/OK-R.pk1'))
-OKMtck = pickle.load(open('C:/Github/space/propellant/OK-M.pk1'))
-OKTtck = pickle.load(open('C:/Github/space/propellant/OK-T.pk1'))
-OKKtck = pickle.load(open('C:/Github/space/propellant/OK-K.pk1'))
-OMRtck = pickle.load(open('C:/Github/space/propellant/OM-R.pk1'))
-OMMtck = pickle.load(open('C:/Github/space/propellant/OM-M.pk1'))
-OMTtck = pickle.load(open('C:/Github/space/propellant/OM-T.pk1'))
-OMKtck = pickle.load(open('C:/Github/space/propellant/OM-K.pk1'))
+OKRtck = pickle.load(open('/home/hans-erik/space/propellant/OK-R.pk1'))
+OKMtck = pickle.load(open('/home/hans-erik/space/propellant/OK-M.pk1'))
+OKTtck = pickle.load(open('/home/hans-erik/space/propellant/OK-T.pk1'))
+OKKtck = pickle.load(open('/home/hans-erik/space/propellant/OK-K.pk1'))
+OMRtck = pickle.load(open('/home/hans-erik/space/propellant/OM-R.pk1'))
+OMMtck = pickle.load(open('/home/hans-erik/space/propellant/OM-M.pk1'))
+OMTtck = pickle.load(open('/home/hans-erik/space/propellant/OM-T.pk1'))
+OMKtck = pickle.load(open('/home/hans-erik/space/propellant/OM-K.pk1'))
 
 OKMtck2lines = pickle.load(open('C:/Github/space/propellant/OK-M2lines.pk1'))
 

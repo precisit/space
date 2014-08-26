@@ -8,16 +8,16 @@ Re = 6371000
 We = np.array([0,0,np.pi*2./(24*3600)])
 
 
-Ptck1 = pickle.load(open('C:/Github/space/simulation/Pressuretck1.pk1'))
-Ptck2 = pickle.load(open('C:/Github/space/simulation/Pressuretck2.pk1'))
+Ptck1 = pickle.load(open('/home/hans-erik/space/simulation/Pressuretck1.pk1'))
+Ptck2 = pickle.load(open('/home/hans-erik/space/simulation/Pressuretck2.pk1'))
 
-Denstck1 = pickle.load(open('C:/Github/space/simulation/Denstck1.pk1'))
-Denstck2 = pickle.load(open('C:/Github/space/simulation/Denstck2.pk1'))
+Denstck1 = pickle.load(open('/home/hans-erik/space/simulation/Denstck1.pk1'))
+Denstck2 = pickle.load(open('/home/hans-erik/space/simulation/Denstck2.pk1'))
 
-Ttck1 = pickle.load(open('C:/Github/space/simulation/Ttck1.pk1'))
-Ttck2 = pickle.load(open('C:/Github/space/simulation/Ttck2.pk1'))
+Ttck1 = pickle.load(open('/home/hans-erik/space/simulation/Ttck1.pk1'))
+Ttck2 = pickle.load(open('/home/hans-erik/space/simulation/Ttck2.pk1'))
 
-dragCoefftck = pickle.load(open('C:/Github/space/simulation/dragCoefftck.pk1'))
+dragCoefftck = pickle.load(open('/home/hans-erik/space/simulation/dragCoefftck.pk1'))
 
 def pressure(alt):
 	if (alt<84852):

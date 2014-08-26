@@ -5,9 +5,9 @@ import logging
 import json
 import imp
 import sys
-sys.path.append('C:/Github/space/Schilling python/')
-sys.path.append('C:/Github/space/propellant/')
-sys.path.append('C:/Github/space/simulation2/RESTAPIs/')
+sys.path.append('/home/hans-erik/space/serverversion/Schilling python/')
+sys.path.append('/home/hans-erik//space/serverversion/propellant/')
+sys.path.append('/home/hans-erik//space/serverversion/simulation/')
 import mainschilling
 import propellantfunc
 import mainrocketsim
@@ -113,7 +113,7 @@ class RocketSimHandler(tornado.web.RequestHandler):
         indata = json.loads(self.request.body)
         response = {}
         try:
-            response["position"], response['velocity'], response['time'], response['mass'] response['deltaV'], response['draglosses'],response['gravitylosses'], response['thrust'],response['drag'],response['downrange'] = mainrocketsim.RocketSimulator(indata)
+            response["position"], response['velocity'], response['time'], response['mass'], response['deltaV'], response['draglosses'],response['gravitylosses'], response['thrust'],response['drag'],response['downrange'] = mainrocketsim.RocketSimulator(indata)
         except KeyError, e:
             raise tornado.web.HTTPError(400,'Not enough input data -- missing: "%s"' % str(e))
         self.write(json.dumps(response))
