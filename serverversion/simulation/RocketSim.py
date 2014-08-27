@@ -26,19 +26,18 @@ def RocketFunc(t, w, rocket):
 	rocket.MainController(t)
 
 	thrust = rocket.thrustGravTurn(pos, vel, t, w[8])
-	#thrust = rocket.ThrustAlgorithm(pos,vel)
 
 	GravityAcc = GravAcc(pos) 					# Acceleration due to gravity
 	dm = rocket.mcurr-w[6] 						# Mass of the rocket
 	dv = np.linalg.norm(thrust)/rocket.mcurr 	# Delta-V
 	dT = np.linalg.norm(thrust)-w[8] 			# Thrust
-	dDrag = np.linalg.norm(dragForce)-w[9]#/rocket.mcurr # Draglosses
+	dDrag = np.linalg.norm(dragForce)-w[9]		# Draglosses
 
-	horizon = OC.GetHorizontalUnitVector(pos, vel)
+	horizon = OC.GetHorizontalUnitVector(pos, vel)					 # These three are used to calculate the gravity losses
 	horizonAng = OC.AngleBetweenVectors(horizon, thrust)
-	dGravdrag = (np.linalg.norm(GravityAcc))*np.sin(horizonAng) 
+	dGravdrag = (np.linalg.norm(GravityAcc))*np.sin(horizonAng) 	
 	
-	dragUnit = atmofunc.unit(atmofunc.inertToSurfVel(vel,pos))
+	dragUnit = atmofunc.unit(atmofunc.inertToSurfVel(vel,pos))		 # Drag unit vector
 
 	acc = (1/rocket.mcurr)*(-dragForce*dragUnit + thrust)+GravityAcc # Resulting acceleration for the rocket
 
@@ -50,10 +49,11 @@ def GravAcc(pos):
 	""" Calculates the gravitational acceleration at the current position """
 	return -pos*consts.G*Me/(np.linalg.norm(pos)**3)
 
-"""
-Gor sa att pitchAlt, initialPitch och gmax satts i rocket-objektet
-"""
+
 def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
+	""" Main calculating routing for the simulation, containing the integration part """
+
+	"""This segment set the time conditions and number of steps """
 	t_start = 0.0
 	t_final = tmax
 	delta_t = dt
@@ -69,11 +69,14 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 	initVel = np.cross(We, initPos)							# Initial velocity vector
 
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-					 rocket.mcurr, 0, rocket.thr1sl,0,0]
+					 rocket.mcurr, 0, rocket.thr1sl,0,0]  	# Declare initial conditions
 
-	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')
-	r.set_initial_value(initial_conds, t_start).set_f_params(rocket)
+	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')		# Initialize integrator object
+	r.set_initial_value(initial_conds, t_start).set_f_params(rocket)		# Set initial conditions
 
+
+	""" The segment below declares arrays for the results, depending
+	on"""
 	pos = np.zeros((3, numsteps))
 	vel = np.zeros((3, numsteps))
 	deltaV = np.zeros((numsteps,1))
