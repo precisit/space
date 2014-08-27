@@ -1,0 +1,94 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      k;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0.24;//uniform 2.0;//1000;
+
+boundaryField
+{
+	#include "${WM_PROJECT_DIR}/etc/caseDicts/setConstraintTypes"
+	inlet
+	{
+		type	fixedValue;
+		value 	$internalField;
+	}
+	outlet
+	{
+		type 		inletOutlet;
+		inletValue	$internalField;
+		value		$internalField;
+	}
+	falcon9
+	{
+		type 	compressible::kqRWallFunction;
+		value	$internalField;
+	}
+	/*
+     inlet
+	{
+		type 	fixedValue;
+		value	uniform 2.0; //$internalField;
+	}
+   	
+	outlet
+	{
+		type 	fixedValue;
+		value	uniform 2.0;//$internalField;
+	}
+	
+	frontAndBack
+	{
+		type 	fixedValue;
+		value	$internalField;
+	}
+	
+	lowerWall
+	{
+		type 	fixedValue;
+		value	$internalField;
+	}
+	
+	upperWall
+	{
+		type 	fixedValue;
+		value	$internalField;
+	}
+	falcon9m
+	{
+		type 	fixedValue;
+		value 	$internalField;
+	}
+	*/
+	upperWall
+	{
+    		type slip;
+	}
+
+	frontAndBack
+	{
+    		type slip;
+	}
+	lowerWall
+	{
+		
+		type slip;
+	}
+}
+
+
+// ************************************************************************* //
