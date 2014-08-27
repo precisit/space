@@ -1,101 +1,653 @@
 <!DOCTYPE html>
 <html>
 <body>
+<style>
+table, th, td
+
+th, td
+{
+padding:6px;
+}
+</style>
 <hr>
 <h1>User manual</h1>
 <hr>
-
-
+<hr>
 <h2>labs.simulations.io/deltaV</h2>
-
+<hr>
 	<p>This API calculates the amount of delta-V required to insert a spacecraft
-	into a specified orbit using Schillings method.</p>
+	into a specified orbit using Schillings method. If not specified otherwise, all units are SI-units, and the data type is float</p>
 
-	<p style="font-family:Lucida console;">
+	<h3>Parameters</h3>
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>alt<i></td>
+		  <td>parking orbit altitude.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>lat<i></td>
+		  <td>the latitude of the launch site. [degrees]</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>incl<i></td>
+		  <td>the inclination of the target orbit. [degrees]</td>		
+		  <td>optional, sets to <i>lat</i> if not specified.</td>
+		</tr>
+		<tr>
+		  <td><i>Tmix<i></td>
+		  <td>the ascent time according to Schilling</td>		
+		  <td>optional, calculated with labs.simulations.io/Tmix if not specified, so for optimal result the user should also include the data listed below</td>
+		</tr>
+	</table>
+
+	<h3>Returns</h3>
+
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>dVtot<i></td>
+		  <td>the total delta-V calculated by Schillings method</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>approximations<i></td>
+		  <td>contains a dictionary of the different approximations made because of too little input.</td>		
+		  <td></td>
+		</tr>
+	</table>
+
+	<h3>Example</h3>
+
+
+	<p style="font-family:Lucida console;font-size:15px;">
 	$ curl --data '{"alt":200000, "lat":28}' http://labs.simulations.io/deltaV 
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
+	<p style="font-family:Lucida console;font-size:15px;">
 	{"dVtot": 9245.707235076003, <br>
 	"Approximations": {"deltaV to parking orbit": 9288.23360759843, "stage separation time": 0, "Isp for stage 1 in vaacum": 320, "Acceleration at sealevel": 11.8, "Ascent time Tmix, approximated to T3s": 500.0712257284257, "inclination": 28}}
 	</p>
 	<br>
 
-
+<hr>
 <h2>labs.simulations.io/Tmix</h2>
+<hr>
+	<p>This API calculates Tmix as described in Schillings paper.If not specified otherwise, all units are SI-units, and the data type is float</p>
 
-	<p>This API calculates Tmix as described in Schillings paper.</p>
+	<h3>Parameters</h3>
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>mb1<i></td>
+		  <td>mass of the fuel of the first stage.</td>		
+		  <td>optional, can be calculated if user specifies <i>mw1</i>,<i>mr1</i> and <i>md1</i></td>
+		</tr>
+		<tr>
+		  <td><i>mb2<i></td>
+		  <td>mass of the fuel of the second stage.</td>		
+		  <td>optional, can be calculated if user specifies <i>mw2</i>,<i>mr2</i> and <i>md2</i>.</td>
+		</tr>
+		<tr>
+		  <td><i>Isp1SL<i></td>
+		  <td>the specfic impulse for the first stage at sealevel.</td>		
+		  <td>optional, but highly recommended</td>
+		</tr>
+		<tr>
+		  <td><i>Isp2V<i></td>
+		  <td>the specfic impulse for the second stage in vaacum.</td>		
+		  <td>optional, but highly recommended</td>
+		</tr>
+		<tr>
+		  <td><i>T1<i></td>
+		  <td>Thrust for the first stage.</td>		
+		  <td>optional, but highly recommended</td>
+		</tr>
+		<tr>
+		<tr>
+		  <td><i>T2<i></td>
+		  <td>Thrust for the second stage.</td>		
+		  <td>optional, but highly recommended</td>
+		</tr>
+		<tr>
+		  <td><i>Isp1V<i></td>
+		  <td>the specific impulse for the first stage in vaacum</td>		
+		  <td>optional, calculated by 1.1*<i>Isp1SL<i></td>
+		</tr>
+		<tr>
+		  <td><i>deltaVp<i></td>
+		  <td>the approximate deltaVp to orbit.</td>		
+		  <td>optional, approximated to 9300 m/s if not <i>alt</i> is specified. If it is, <i>deltaVp</i> is approximated to the the escape velocity + 1500 m/s.</td>
+		</tr>
+		<tr>
+		  <td><i>A0<i></td>
+		  <td>the initial acceleration at sealevel</td>		
+		  <td>optional, calculated with <i>mw1, mw2, mp</i> if not specified. If these are not specified, A0 is approximated to 11.8 m/s<sup>2</sup></td>
+		</tr>
+		<tr>
+		  <td><i>ssT<i></td>
+		  <td>the stage separation time</td>		
+		  <td>optional, set to 0 if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>mw1, mw2, md1, md2, mr1, mr2<i></td>
+		  <td>the wetmasses, dry masses and the residuals for each stage.</td>		
+		  <td>optional, but highly recommended to specify this or <i>mb1, mb2</i></td>
+		</tr>
+	</table>
 
-	<p style="font-family:Lucida console;">
+	<h3>Returns</h3>
+
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>Tmix<i></td>
+		  <td>the total ascent time according to Schillings method.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>approximations<i></td>
+		  <td>contains the different approximations made because of too little input.</td>		
+		  <td></td>
+		</tr>
+	</table>
+
+	<h3>Example</h3>
+
+	<p style="font-family:Lucida console;font-size:15px;">
 	$ curl --data '{"mb1":386000, "Isp1SL":282, "T1":5885000, "mb2":87000, "Isp2V":345, "T2":800000}' http://labs.simulations.io/Tmix
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
+	<p style="font-family:Lucida console;font-size:15px;">
 	{"Tmix": 516.3851378224726, <br>
 	"Approximations": {"Acceleration at sealevel": 11.8, "deltaV to parking orbit": 9300, "stage separation time": 0, "Isp for stage 1 in vaacum": 310.20000000000005, "Ascent time Tmix calculated to": 516.3851378224726}}
 	</p>
 	<br>
 
+
+
+
+<hr>
 <h2>labs.simulations.io/rocketCapability</h2>
+<hr>
 
-	<p>This API calculates the maximum payload to a specified orbit using Schillings method and the rocket equation.</p>
+	<p>This API calculates the maximum payload to a specified orbit using Schillings method and the rocket equation. If not specified otherwise, all units are SI-units, and the data type is float</p>
 
-	<p style="font-family:Lucida console;">
+	<h3>Parameters</h3>
+	<table style="width:800px;background-color:lightgrey">
+
+		<tr>
+		  <td><i>Isp1SL<i></td>
+		  <td>the specfic impulse for the first stage at sealevel.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>Isp2V<i></td>
+		  <td>the specfic impulse for the second stage in vaacum.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>T1<i></td>
+		  <td>Thrust for the first stage.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		<tr>
+		  <td><i>T2<i></td>
+		  <td>Thrust for the second stage.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>Isp1V<i></td>
+		  <td>the specific impulse for the first stage in vaacum</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>mw1, mw2, md1, md2, mr1, mr2<i></td>
+		  <td>the wetmasses, dry masses and the residuals for each stage.</td>		
+		  <td></i></td>
+		</tr>
+		<tr>
+		  <td><i>alt<i></td>
+		  <td>parking orbit altitude.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>lat<i></td>
+		  <td>the latitude of the launch site. [degrees]</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>incl<i></td>
+		  <td>the inclination of the target orbit. [degrees]</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>ssT<i></td>
+		  <td>the stage separation time</td>		
+		  <td>optional, set to 0 if not specified</td>
+		</tr>
+
+	</table>
+
+	<h3>Returns</h3>
+
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>Tmix<i></td>
+		  <td>the total ascent time according to Schillings method.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>approximations<i></td>
+		  <td>A dictionary containing the different approximations made because of too little input.</td>		
+		  <td></td>
+		</tr>
+	</table>
+
+	<h3>Example</h3>
+
+
+	<p style="font-family:Lucida console;font-size:15px;">
 	$ curl --data '{"mw1":402000,"md1":16000, "mr1":3900, "Isp1SL":282, "Isp1V":320, "T1": 5885000, "mw2":90720, "md2":3200,"mr2":182,"Isp2V":345, "T2":800e3, "alt":200000,"lat":28, "incl":28}' http://labs.simulations.io/rocketCapability
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
+	<p style="font-family:Lucida console;font-size:15px;">
 	{"Approximations": {"stage separation time": 0},<br>
 	"mp": 19919.042250353956}
 	</p>
 	<br>
+
+
+
+
+
+
+<hr>	
 <h2>labs.simulations.io/atmoPressure -- /atmoTemp -- /atmoDensity </h2>
+<hr>
 
-	<p>These APIs returns the pressure, temperature or density at given altitudes according to the model taken from braeunig.us .</p>
+	<p>These APIs returns the pressure, temperature or density at given altitudes according to the model taken from braeunig.us. If not specified otherwise, all units are SI-units, and the data type is float.</p>
 
-	<p style="font-family:Lucida console;">
-	curl --data '{"alt":10000}' http://labs.simulations.io/atmoPressure
+	<h3>Parameters</h3>
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>alt<i></td>
+		  <td>altitude.</td>		
+		  <td>optional, can be set to an interval instead. see below</td>
+		</tr>
+		<tr>
+		  <td><i>alt0,alt1<i></td>
+		  <td>an altitude interval</td>		
+		  <td>optional, can use <i>alt</i> instead</td>
+		</tr>
+		<tr>
+		  <td><i>res<i></td>
+		  <td>resolution of the specified interval.</td>		
+		  <td>optional, sets to 10 if not specified</td>
+		</tr>
+	</table>
+
+	<h3>Returns</h3>
+
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>pressure, temp, or density<i></td>
+		  <td>The pressure temperature or density depending on which API the user called. Can also be a list of values.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>altitude<i></td>
+		  <td>the altitude. Can be a list.</td>		
+		  <td></td>
+		</tr>
+	</table>
+
+	<h3>Example 1</h3>
+
+	<p style="font-family:Lucida console;font-size:15px;">
+	$ curl --data '{"alt":10000}' http://labs.simulations.io/atmoPressure
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
+	<p style="font-family:Lucida console;font-size:15px;">
 	{"pressure": 26436.300000000003, "altitude": 10000}
 	</p>
 
-	<p>and:</p> 
+	<h3>Example 2</h3>
 
-	<p style="font-family:Lucida console;">
+	<p style="font-family:Lucida console;font-size:15px;">
 	$ curl --data '{"alt0":10000, "alt1":20e3, "res":5}' http://labs.simulations.io/atmoPressure
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
+	<p style="font-family:Lucida console;font-size:15px;">
 	{"pressure": [26436.300000000003, 17859.817129950592, 12044.599999999999, 8109.9290101863035, 5474.890000000001], <br>
 	"altitude": [10000.0, 12500.0, 15000.0, 17500.0, 20000.0]}
 	</p>
 	<br>
 
+
+
+
+<hr>
 <h2>labs.simulations.io/rocketSim</h2>
+<hr>
 
-	<p>This API does a simulated rocket launch and returns a number of values depending on what the user specified</p>
+	<p>This API does a simulated rocket launch and returns a number of values depending on what the user specified. If not specified otherwise, all units are SI-units, and the data type is float.</p>
 
-	<p style="font-family:Lucida console;">
-	curl --data '{"alt":10000}' http://labs.simulations.io/atmoPressure
+	<h3>Parameters</h3>
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>tAlt<i></td>
+		  <td>target altitude for the orbit</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		<tr>
+		<tr>
+		  <td><i>lat<i></td>
+		  <td>latitude of the launchsite. [degrees]</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>lat<i></td>
+		  <td>longitude of the launchsite. [degrees]</td>		
+		  <td>optional, sets to 0 degrees if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>rocket<i></td>
+		  <td>The rocket to launch. can either be "falcon9", "ariane5", "saturnV", "soyuz2b", or "custom".</td>		
+		  <td>optional, sets to falcon 9 if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>payload<i></td>
+		  <td>mass of the payload</td>		
+		  <td>optional, sets to 10000 kg if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>pitchAlt<i></td>
+		  <td>The altitude where the rocket starts turning towards a gravity turn.</td>		
+		  <td>optional, sets to 10000 m if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>pitchT<i></td>
+		  <td>The time during which the rocket turns toward a gravity turn.</td>		
+		  <td>optional, sets to 2.5 s if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>pitchAng<i></td>
+		  <td>The angle to horizon in which the thrust force is directed to turn towards a gravity turn. [degrees]</td>
+
+		  <td>optional, sets to 45 degrees if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>initAng<i></td>
+		  <td>The angle to vertical in which the thrust force is directed during the initial ascent phase</td>		  
+		  <td>optional, sets to 45 degrees if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>gmax<i></td>
+		  <td>The maximum G's allowed.</td>		  
+		  <td>optional, sets to 1000 if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>tmax<i></td>
+		  <td>The time for the simulation</td>		  
+		  <td>optional, sets to 5000 s if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>dt<i></td>
+		  <td>The time step of the returning vectors</td>		  
+		  <td>optional, sets to 1 s if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>optional<i></td>
+		  <td>A dictionary containing which optional parameters to be returned</td>		
+		  <td>optional, sets all to False if not specified</td>
+		</tr>
+				<tr>
+				  <td></td>
+				  <td><i>draglosses<i></td>		
+				  <td>Aets if draglosses should be returned or not. input boolean</td>
+				  <td></td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>gravlosses<i></td>		
+				  <td>Sets if gravlosses should be returned or not. input boolean</td>
+				  <td></td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>drag<i></td>		
+				  <td>Sets if drag should be returned or not. input boolean</td>
+				  <td></td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>downrange<i></td>		
+				  <td>Sets if downrange distance travelled should be returned or not. input boolean</td>
+				  <td></td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>thrust<i></td>		
+				  <td>Sets if thrust should be returned or not. input boolean</td>
+				  <td></td>
+				</tr>
+		<tr>
+		  <td><i>stats<i></td>
+		  <td>A dictionary containing the specs of the custom rocket</td>		
+		  <td>mandatory if user specified <i>rocket</i> as "custom"</td>
+		</tr>
+				<tr>
+				  <td></td>
+				  <td><i>mw1, md1, mi1<i></td>		
+				  <td>Wet, dry, and residual mass for the first stage</td>
+				  <td></td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>isp1v,isp1sl<i></td>		
+				  <td> Vacuum and sealevel specific impulse for the first stage.</td>
+				  <td></td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>thr1sl<i></td>		
+				  <td>Sealevel thrust for the first stage.</td>
+				  <td></td>
+				</tr>
+				<tr>
+				<tr>
+				  <td></td>
+				  <td><i>Aflow<i></td>		
+				  <td>The area of the reference surface perpendicular to the velocity. Used for drag</td>
+				  <td></td>
+				</tr>
+				<tr>
+				<tr>
+				  <td></td>
+				  <td><i>mw2, md2, mi2<i></td>		
+				  <td>Wet, dry, and residual mass for the second stage</td>
+				  <td>Sets to 0 if not specified</td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>isp2v<i></td>		
+				  <td>Vacuum specific impulse for the second stage.</td>
+				  <td>Sets to 0 if not specified</td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>thr2v<i></td>		
+				  <td>Vaacum thrust for the second stage.</td>
+				  <td>Sets to 0 if not specified</td>
+				</tr>
+				<tr>
+				<tr>
+				  <td></td>
+				  <td><i>mw3, md3, mi3<i></td>		
+				  <td>Wet, dry, and residual mass for the third stage</td>
+				  <td>Sets to 0 if not specified.</td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>isp3v<i></td>		
+				  <td> vacuum specific impulse for the third stage.</td>
+				  <td>Sets to 0 if not specified.</td>
+				</tr>
+				<tr>
+				  <td></td>
+				  <td><i>thr3v<i></td>		
+				  <td>vaacum thrust for the third stage.</td>
+				  <td>Sets to 0 if not specified.</td>
+				</tr>
+				<tr>
+				<tr>
+				  <td></td>
+				  <td><i>booster<i></td>		
+				  <td>Boolean value if the values in the third stage is a booster for the first stage or not.</td>
+				  <td>Sets to False if not specified.</td>
+				</tr>
+				<tr>
+
+	</table>
+
+	<h3>Returns</h3>
+
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>position<i></td>
+		  <td>A list of positions of the spacecraft expressed in a cartesian inertial reference frame.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>velocity<i></td>
+		  <td>A list of velocities of the spacecraft expressed in a cartesian inertial reference frame.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>time<i></td>
+		  <td>A list of corresponding times.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>mass<i></td>
+		  <td>A list containing current mass.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>deltaV<i></td>
+		  <td>Delta-V used.</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>draglosses<i></td>
+		  <td>Draglosses expressed in delta-V.</td>		
+		  <td>Optional, returns 0 if not specified.</td>
+		</tr>
+		<tr>
+		  <td><i>gravitylosses<i></td>
+		  <td>Gravitylosses expressed in delta-V.</td>		
+		  <td>Optional, returns 0 if not specified.</td>
+		</tr>
+		<tr>
+		  <td><i>thrust<i></td>
+		  <td>A list containing the magnitude of thrust.</td>		
+		  <td>Optional, returns 0 if not specified</td>
+		</tr>
+		<tr>
+		  <td><i>drag<i></td>
+		  <td>A list containing the magnitude of drag.</td>		
+		  <td>Optional, returns 0 if not specified.</td>
+		</tr>
+		<tr>
+		  <td><i>downrange<i></td>
+		  <td>A list containing the the current downrange distance.</td>		
+		  <td>Optional, returns 0 if not specified.</td>
+		</tr>
+	</table>
+
+	<h3>Example 1</h3>
+
+	<p style="font-family:Lucida console;font-size:15px;">
+	$ curl --data '{"tAlt":10000, "lat":28}' http://labs.simulations.io/rocketSim
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
-	{"pressure": 26436.300000000003, "altitude": 10000}
+	<p style="font-family:Lucida console;font-size:15px;">
+	{"gravitylosses": 0, "deltaV": 4918.1736332593782, "draglosses": 0, "downrange": [0], "drag": [0],"thrust":[0],"position": [3X5001 list], "velocity": [3X5001 list], "time":[1X5001 list], "mass":[1X5001 list]}
 	</p>
 
-	<p>and:</p> 
+	<h3>Example 2</h3> 
 
-	<p style="font-family:Lucida console;">
-	$ curl --data '{"alt0":10000, "alt1":20e3, "res":5}' http://labs.simulations.io/atmoPressure
+	<p style="font-family:Lucida console;font-size:15px;">
+	$ curl --data '{"rocket":"falcon9", "payload":17000, <br>
+	"lat":0, "tAlt":150000, "gmax":5,<br>
+	"pitchAlt":10000, "pitchT":1, "initAng":5, "pitchAng":45, <br>
+	"tmax":8000,"dt":1,<br>
+	"optional":{"draglosses":"true", "thrust":"true", "gravlosses":"true", "downrange":"true", "drag":"true"}}' http://labs.simulations.io/rocketSim
 	</p>
 	<p>Returns:</p>
-	<p style="font-family:Lucida console;">
-	{"pressure": [26436.300000000003, 17859.817129950592, 12044.599999999999, 8109.9290101863035, 5474.890000000001], <br>
-	"altitude": [10000.0, 12500.0, 15000.0, 17500.0, 20000.0]}
+	<p style="font-family:Lucida console;font-size:15px;">
+	{"gravitylosses": 0, "deltaV": 4918.1736332593782, "draglosses": 0, "downrange": [1X8001 list], "drag": [1X8001 list], "thrust":[1X8001 list], position": [3X8001 list], "velocity": [3X8001 list], "time":[1X8001 list], "mass":[1X8001 list]}
 	</p>
 	<br>
+
+<hr>	
+<h2>labs.simulations.io/OMR/fuel -- /AFT/fuel -- /SHR/fuel -- /GMW/fuel </h2>
+<hr>
+
+	<p>These APIs returns the Optimum Mixture ratio, Adiabatic Flame Temperature, Specific Heat Ratio and Gas Molecular Weight taken from http://www.braeunig.us/space/comb.htm. The calls should always be followed by the fuel to use. Current fuels supported are LOX/methane and LOX/kerosene. If not specified otherwise, all units are SI-units, and the data type is float.</p>
+
+	<h3>Parameters</h3>
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>Pc<i></td>
+		  <td>Chamber pressure. [atm]</td>		
+		  <td></td>
+		</tr>
+		<tr>
+		  <td><i>Pe<i></td>
+		  <td>Nozzle exit pressure [atm] or Mixture ratio, depending on which function is called.</td>		
+		  <td></td>
+		</tr>
+	</table>
+
+	<h3>Returns</h3>
+
+	<table style="width:800px;background-color:lightgrey">
+		<tr>
+		  <td><i>OMR, AFT, SHR or GMW<i></td>
+		  <td>The Optimum Mixture ratio, Adiabatic Flame Temperature, Specific Heat Ratio or Gas Molecular Weight, depending on which API the user called.</td>		
+		  <td></td>
+		</tr>
+	</table>
+
+	<h3>Example 1</h3>
+
+	<p style="font-family:Lucida console;font-size:15px;">
+	$ curl --data '{"Pc":100, "Pe":0.5}' http://labs.simulations.io/OMR/loxker
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;font-size:15px;">
+	{"OMR": 2.3517541729218383}
+	</p>
+
+	<h3>Example 2</h3>
+
+	<p style="font-family:Lucida console;font-size:15px;">
+	$ curl --data '{"Pc":100, "Pe":2.8}' http://labs.simulations.io/AFT/loxmeth     
+	</p>
+	<p>Returns:</p>
+	<p style="font-family:Lucida console;font-size:15px;">
+	{"AFT": 3432.111821119785}
+	</p>
+	<br>
+
+
+
+
+
+
+
 
 </body>
 </html>
