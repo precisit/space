@@ -1,12 +1,13 @@
 Instruktioner för att mesha och köra parallelt
 
+0   Skriv of230 för att göra konsolen redo för OpenFOAM-kommandon
 1 	Kör <blockMesh> för att ska bakgrundslagret
 2 	Kör <surfaceFeatureExtract> för att snappyHexMesh kan 'snappa'.
-3 	<decomposePar> för att dela upp meshet till önsklat antal processorer (kärnor). Ställ in i decomposeParDict.
+3 	<decomposePar> för att dela upp meshet till önsklat antal processorer (kärnor). Ställ in i decomposeParDict. (Skicppa för seriell körning.)
 4 	<mpirun -np x snappyHexMesh -overwrite -parallel> för att mesha parallelt med x kärnor. <snappyHexMesh -overwrite> för vanlig körning.
 5 	<reconstructParMesh -constant> för att sätta ihop meshet igen.
 6 	Ta bort processor-foldrarna
-7 	<decomposePar> igen.
+7 	<decomposePar> igen. (Skippa för seriell körning)
 8 	<mpirun -np x sonicFoam -parallel> eller <pyFoamPlotRunner.py mpirun -np x sonicFoam -parallel> för att se residualer i realtid. (kräver gnuplot, numpy och pyfoam.)
 9 	<reconstructPar> för att sätta ihop resultatet.
 10	<paraFoam> för att se resultat och efterbehandla.														
