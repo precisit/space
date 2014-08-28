@@ -19,9 +19,9 @@ def surfToInertPos(ri,t):
 
 url = "http://labs.simulations.io/rocketSim"
 
-param = {'rocket':'ariane5', 'payload':5000, 'lat':0, 'tAlt':150000, 'gmax':4,
+param = {'rocket':'soyuz2b', 'payload':1000, 'lat':0, 'tAlt':150000, 'gmax':99,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True, 'drag':True}, 
-								'pitchAlt':10000, 'pitchT':1, 'initAng':7, 'pitchAng':45,
+								'pitchAlt':10000, 'pitchT':1, 'initAng':4, 'pitchAng':45,
 								'tmax':4000,'dt':1}
 param1 = {'rocket':'custom', 'payload':10000, 'lat':0, 'tAlt':150000000, 'gmax':999,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 

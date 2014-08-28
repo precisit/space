@@ -241,7 +241,7 @@ def CreateRocket(param):
 		rocket = Rocket(param['payload'], 0, param['pitchAlt'], param['pitchT'], param['pitchAng'], param['initAng'], param['gmax'], param['tAlt'],
 							170800, 1.27e4, 0, 430, 340, 1.1114e6, 22.9, #Arean utan boosters
 						   	1.25e4, 2.7e3,  0, 324, 2.24e4, 
-						  	555000, 79600, 0, 275, 6.47e6, True)
+						  	555000, 79600, 0, 275, 2*6.47e6, True)
 	elif param['rocket'] == 'soyuz2b':
 		rocket = Rocket(param['payload'], 0, param['pitchAlt'], param['pitchT'], param['pitchAng'], param['initAng'], param['gmax'], param['tAlt'],
 							105400, 6875, 0, 311, 245, 9.99e5, 22,	  # ungefar samma som falcon 9 med payload fairing
