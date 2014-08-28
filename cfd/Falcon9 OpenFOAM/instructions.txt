@@ -1,6 +1,7 @@
 Instruktioner för att mesha och köra parallelt
+<> för kommandon
 
-0   Skriv of230 för att göra konsolen redo för OpenFOAM-kommandon
+0   Skriv <of230> för att göra konsolen redo för OpenFOAM-kommandon
 1 	Kör <blockMesh> för att ska bakgrundslagret
 2 	Kör <surfaceFeatureExtract> för att snappyHexMesh kan 'snappa'.
 3 	<decomposePar> för att dela upp meshet till önsklat antal processorer (kärnor). Ställ in i decomposeParDict. (Skicppa för seriell körning.)
