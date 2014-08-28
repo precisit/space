@@ -67,9 +67,14 @@ def RocketSimulator(rocket, longi, lat, tmax, dt, optional):
 				 np.cos(lat)*np.sin(longi),
 				 np.sin(lat)])								# Initial position vector
 	initVel = np.cross(We, initPos)							# Initial velocity vector
-
+	
+	if rocket.booster: 
+		initialThrust = rocket.thr1sl + rocket.thr3v
+	else:
+		initialThrust = rocket.thr1sl
+		
 	initial_conds = [initPos[0], initVel[0], initPos[1], initVel[1], initPos[2], initVel[2],
-					 rocket.mcurr, 0, rocket.thr1sl,0,0]  	# Declare initial conditions
+					 rocket.mcurr, 0, initialThrust,0,0]  	# Declare initial conditions
 
 	r = integrate.ode(RocketFunc).set_integrator('vode', method='bdf')		# Initialize integrator object
 	r.set_initial_value(initial_conds, t_start).set_f_params(rocket)		# Set initial conditions

@@ -19,10 +19,10 @@ def surfToInertPos(ri,t):
 
 url = "http://labs.simulations.io/rocketSim"
 
-param = {'rocket':'falcon9', 'payload':17000, 'lat':0, 'tAlt':150000, 'gmax':5,
+param = {'rocket':'ariane5', 'payload':5000, 'lat':0, 'tAlt':150000, 'gmax':4,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True, 'drag':True}, 
-								'pitchAlt':10000, 'pitchT':1, 'initAng':5, 'pitchAng':45,
-								'tmax':8000,'dt':1}
+								'pitchAlt':10000, 'pitchT':1, 'initAng':7, 'pitchAng':45,
+								'tmax':4000,'dt':1}
 param1 = {'rocket':'custom', 'payload':10000, 'lat':0, 'tAlt':150000000, 'gmax':999,
 								'optional':{'draglosses':True, 'thrust':True, 'gravlosses':True, 'downrange':True}, 
 								'pitchAlt':12000, 'pitchT':1, 'initAng':0, 'pitchAng':45,
@@ -83,6 +83,7 @@ plt.xlabel("time [s]")
 
 plt.show()
 
+
 plt.subplot(3,1,1)
 plt.plot(t, thrust)
 plt.ylabel("thrust [N]")
@@ -95,5 +96,7 @@ plt.subplot(3,1,3)
 plt.plot(t, (thrust-drag)/(mass*9.81))
 plt.ylabel("G-force by thrust and drag")
 plt.show()
+
+
 
 print data['draglosses'], data['deltaV']
